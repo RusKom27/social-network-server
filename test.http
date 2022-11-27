@@ -1,7 +1,40 @@
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "login": "user2",
+  "password": "password2"
+}
+
+###
+
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "login": "user2",
+  "email": "email2",
+  "password": "password2"
+}
+
+###
+POST http://localhost:3000
+Content-Type: application/json
+
+{
+  "login": "user1",
+  "email": "email1",
+  "password": "password1"
+}
+
+###
 POST http://localhost:3000/profile
 Content-Type: application/json
 
-{}
+{
+  "author_id": "63837b05aca2b4ac81b8ed1f",
+  "text": "req.body.text"
+}
 
 ###
 GET http://localhost:3000/profile

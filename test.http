@@ -1,3 +1,9 @@
+POST http://localhost:3000/profile
+Content-Type: application/json
+
+{}
+
+###
 GET http://localhost:3000/profile
 
 ###

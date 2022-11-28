@@ -22,9 +22,11 @@ app.use(express.json())
 const indexRouter = require('./routes/indexRouter')
 const authRouter = require('./routes/authRouter')
 const profileRouter = require('./routes/profileRouter')
+const usersRouter = require('./routes/usersRouter')
 
 app.use('/', indexRouter)
 app.use('/auth', authRouter)
+app.use('/users', usersRouter)
 app.use('/profile', profileRouter)
 
 const debug = require('debug')('social_network:server')

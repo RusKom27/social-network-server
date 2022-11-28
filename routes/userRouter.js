@@ -4,7 +4,7 @@ const router = express.Router()
 
 router.get('/', async (req, res, next) => {
     try {
-        User.find().then(users => {
+        User.find().then(users => { //pagination .skip(0).limit(1)
             res.send(users)
         })
     } catch (err) {

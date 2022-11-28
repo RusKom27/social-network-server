@@ -17,9 +17,8 @@ db.once('open', () => console.log('Connected to database...'))
 
 app.use(cors(corsOptions))
 app.use(logger('dev'))
-app.use(express.json())
+app.use(express.static("public"))
 
-app.use('/', require('./routes/indexRouter'))
 app.use('/auth', require('./routes/authRouter'))
 app.use('/user', require('./routes/userRouter'))
 app.use('/post', require('./routes/postRouter'))

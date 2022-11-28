@@ -19,7 +19,7 @@ router.get('/:id', async (req, res, next) => {
     }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', async (req, res) => {
     const post = await new Post({
         author_id: await User.findById(req.body.author_id).then(user => user._id),
         text: req.body.text,

@@ -23,7 +23,7 @@ Content-Type: application/json
 
 {
   "author_id": "63839b940f668cd883a69dd6",
-  "text": "Second user post"
+  "text": "Third user post"
 }
 
 ###
@@ -31,9 +31,9 @@ POST http://localhost:3000/message
 Content-Type: application/json
 
 {
-  "sender_id": "63839b940f668cd883a69dd6",
-  "receiver_id": "63837b05aca2b4ac81b8ed1f",
-  "text": "How are you?"
+  "sender_id": "63837b05aca2b4ac81b8ed1f",
+  "receiver_id": "63839b940f668cd883a69dd6",
+  "text": "Fine"
 }
 
 ###

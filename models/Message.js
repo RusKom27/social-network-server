@@ -2,7 +2,12 @@ const mongoose = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId
 
 const schema = new mongoose.Schema({
-    author_id: {
+    sender_id: {
+        type: ObjectId,
+        ref: 'User',
+        required: true
+    },
+    receiver_id: {
         type: ObjectId,
         ref: 'User',
         required: true
@@ -15,18 +20,10 @@ const schema = new mongoose.Schema({
         type: String,
         default: "",
     },
-    likes: {
-        type: Number,
-        default: 0,
-    },
-    dislikes: {
-        type: Number,
-        default: 0,
-    },
     creation_date: {
         type: Date,
         default: Date.now
     }
 })
 
-module.exports = mongoose.model('Post', schema, 'posts')
+module.exports = mongoose.model('Message', schema, 'messages')

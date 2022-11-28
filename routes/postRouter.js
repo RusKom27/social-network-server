@@ -5,8 +5,15 @@ const User = require('../models/User')
 
 router.get('/', async (req, res, next) => {
     try {
-        const posts = await Post.find()
-        res.send(posts)
+        Post.find().then(posts => res.send(posts))
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/:id', async (req, res, next) => {
+    try {
+        Post.findById(req.body.id).then(post => res.send(post))
     } catch (err) {
         res.status(500).json({message: err.message})
     }

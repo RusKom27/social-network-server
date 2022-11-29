@@ -2,9 +2,11 @@
   "version": 2,
   "name": "social_network_server",
   "builds": [
-    { "src": "index.js", "use": "@vercel/node" }
+    { "src": "index.js", "use": "@vercel/node" },
+    { "src": "public/**", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/index.js" }
+    { "src": "/(.*)", "dest": "/index.js" },
+    { "src": "/", "dest": "public/index.html"}
   ]
 }

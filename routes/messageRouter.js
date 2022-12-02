@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Message = require('../models/Message')
+const Dialog = require('../models/Dialog')
 const User = require('../models/User')
 
 router.get('/', async (req, res, next) => {
@@ -22,7 +23,7 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
     const message = await new Message({
         sender_id: await User.findById(req.body.sender_id).then(user => user._id),
-        receiver_id: await User.findById(req.body.receiver_id).then(user => user._id),
+        dialog_id: await Dialog.findById(req.body.dialog_id).then(dialog => dialog._id),
         text: req.body.text,
         image: req.body.image,
     })

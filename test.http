@@ -1,21 +1,22 @@
+
 ###
-POST http://localhost:3000/auth/login
+POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "login": "user2",
-  "password": "password2"
+  "login": "user1",
+  "password": "password1"
 }
 
 ###
 
-POST http://localhost:3000/auth/register
+POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "login": "user2",
-  "email": "email2",
-  "password": "password2"
+  "login": "user4",
+  "email": "email4",
+  "password": "password4"
 }
 
 ###
@@ -23,8 +24,8 @@ POST http://localhost:3000/api/post
 Content-Type: application/json
 
 {
-  "author_id": "63839b940f668cd883a69dd6",
-  "text": "Third user post"
+  "author_id": "6389eb695fdc5cb837575667",
+  "text": "First user post"
 }
 
 ###
@@ -32,14 +33,25 @@ POST http://localhost:3000/api/message
 Content-Type: application/json
 
 {
-  "sender_id": "63837b05aca2b4ac81b8ed1f",
-  "receiver_id": "63839b940f668cd883a69dd6",
-  "text": "Fine"
+  "sender_id": "6389ee473a59ad984960e97b",
+  "dialog_id": "6389eece3a59ad984960e981",
+  "text": "Hi!"
+}
+
+###
+POST http://localhost:3000/api/dialog
+Content-Type: application/json
+
+{
+  "members_id": [
+    "6389ee473a59ad984960e97b",
+    "6389ea976372580be6b8f066"
+  ]
 }
 
 ###
 
-GET http://localhost:3000/user
+GET http://localhost:3000/api/user
 
 ###
 
@@ -48,5 +60,10 @@ GET http://localhost:3000/api/message
 ###
 
 GET http://localhost:3000/api/post
+
+###
+
+GET http://localhost:3000/api/dialog
+User-ID: 6389eb695fdc5cb837575667
 
 ###

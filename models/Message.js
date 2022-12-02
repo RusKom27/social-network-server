@@ -7,9 +7,9 @@ const schema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    receiver_id: {
+    dialog_id: {
         type: ObjectId,
-        ref: 'User',
+        ref: 'Dialog',
         required: true
     },
     text: {

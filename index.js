@@ -4,6 +4,7 @@ const app = express()
 const mongoose = require('mongoose')
 const cors = require('cors')
 const logger = require('morgan')
+const bodyParser = require('body-parser');
 
 const corsOptions = {
     credentials: true,            //access-control-allow-credentials:true
@@ -18,6 +19,7 @@ db.once('open', () => console.log('Connected to database...'))
 app.use(cors(corsOptions))
 app.use(logger('dev'))
 app.use(express.static("public"))
+app.use(bodyParser.json())
 
 app.use('/api/auth', require('./routes/authRouter'))
 app.use('/api/user', require('./routes/userRouter'))

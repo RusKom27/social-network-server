@@ -19,9 +19,9 @@ router.post('/register', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
     try {
         if (req.body.password) {
-            if (req.body.login)
+            if (req.body.email)
                 User.findOne({
-                    login: req.body.login,
+                    email: req.body.email,
                     password: req.body.password
                 })
                 .then(user => res.json(user))

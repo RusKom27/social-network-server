@@ -11,7 +11,7 @@ const corsOptions = {
     optionSuccessStatus: 200
 }
 
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(process.env.LOCAL_MONGO_URL)
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
 db.once('open', () => console.log('Connected to database...'))

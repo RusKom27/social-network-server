@@ -4,8 +4,8 @@ const router = express.Router()
 
 router.get('/', async (req, res, next) => {
     try {
-        User.find().then(users => { //pagination .skip(0).limit(1)
-            res.send(users)
+        User.findById(req.headers.authorization).then(user => { //pagination .skip(0).limit(1)
+            res.send(user)
         })
     } catch (err) {
         res.status(404).json({message: err.message})

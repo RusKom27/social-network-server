@@ -16,12 +16,9 @@ const schema = new mongoose.Schema({
         default: "",
     },
     likes: {
-        type: Number,
-        default: 0,
-    },
-    dislikes: {
-        type: Number,
-        default: 0,
+        type: [ObjectId],
+        ref: 'User',
+        default: []
     },
     creation_date: {
         type: Date,

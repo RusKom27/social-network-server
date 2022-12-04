@@ -5,7 +5,8 @@ const router = express.Router()
 router.get('/', async (req, res, next) => {
     try {
         User.findById(req.headers.authorization).then(user => { //pagination .skip(0).limit(1)
-            res.send(user)
+            if (user) res.send(user)
+            else res.status(404).json({message: "User not found!"})
         })
     } catch (err) {
         res.status(404).json({message: err.message})

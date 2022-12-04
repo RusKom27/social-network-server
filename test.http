@@ -24,7 +24,6 @@ POST http://localhost:3000/api/post
 Content-Type: application/json
 
 {
-  "author_id": "6389eb695fdc5cb837575667",
   "text": "First user post"
 }
 
@@ -65,6 +64,9 @@ GET http://localhost:3000/api/post
 ###
 
 GET http://localhost:3000/api/dialog
-User-ID: 6389eb695fdc5cb837575667
+authorization: 6389eb695fdc5cb837575667
 
 ###
+
+PUT http://localhost:3000/api/post/like/638cb4fd2fcb67b4aa2bfdfb
+authorization: 638cb4f92fcb67b4aa2bfdf4

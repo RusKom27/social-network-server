@@ -4,6 +4,7 @@ const router = express.Router()
 
 router.post('/register', async (req, res, next) => {
     const user = new User({
+        name: req.body.name,
         login: req.body.login,
         email: req.body.email,
         password: req.body.password,
@@ -18,14 +19,13 @@ router.post('/register', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
     try {
-        if (req.body.password) {
-            if (req.body.email)
-                User.findOne({
-                    email: req.body.email,
-                    password: req.body.password
-                })
-                .then(user => res.json(user))
-        }
+        User.findOne({
+            email: req.body.email,
+            password: req.body.password
+        }).then(user => {
+            if (user) res.json(user)
+            else res.status(404).json({message: "User not found!"})
+        })
     } catch (err) {
         res.status(400).json({message: err.message})
     }

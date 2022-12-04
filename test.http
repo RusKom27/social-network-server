@@ -70,3 +70,7 @@ authorization: 6389eb695fdc5cb837575667
 
 PUT http://localhost:3000/api/post/like/638cb4fd2fcb67b4aa2bfdfb
 authorization: 638cb4f92fcb67b4aa2bfdf4
+
+###
+
+DELETE http://localhost:3000/api/post/638cb2d856e43ebb3c584cf0

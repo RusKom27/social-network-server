@@ -5,7 +5,10 @@ const User = require('../models/User')
 
 router.get('/', async (req, res, next) => {
     try {
-        let posts = await Post.find({author_id: req.headers.authorization}).then(posts => posts)
+        let posts
+        if (req.headers.authorization)
+            posts = await Post.find({author_id: req.headers.authorization}).then(posts => posts)
+        else posts = await Post.find().then(posts => posts)
         for (let i = 0; i < posts.length; i++) {
             await User.findById(posts[i].author_id).then(user => {
                 posts[i] = {...posts[i]._doc, user}
@@ -41,17 +44,28 @@ router.post('/', async (req, res) => {
 })
 
 router.put('/like/:id', async (req, res) => {
-    const user = await User.findById(req.headers.authorization).then(user => user)
-    let post = await Post.findById(req.params.id).then(post => post)
-    const user_index = post.likes.indexOf(user._id)
-    if (user_index > -1) post.likes.splice(user_index, 1)
-    else post.likes.push(user._id)
     try {
+        const user = await User.findById(req.headers.authorization).then(user => user)
+        let post = await Post.findById(req.params.id).then(post => post)
+        const user_index = post.likes.indexOf(user._id)
+        if (user_index > -1) post.likes.splice(user_index, 1)
+        else post.likes.push(user._id)
+        let author_user = await User.findById(post.author_id).then(user => user)
         let newPost = await post.save()
-        res.status(201).json({...newPost._doc, user})
+        res.status(201).json({...newPost._doc, user: author_user})
     } catch (err) {
         res.status(400).json({message: err.message})
     }
+})
+
+router.delete('/:id', async (req, res, next) => {
+    try {
+        await Post.deleteOne({_id: req.params.id}).then(post => post)
+        res.json({_id: req.params.id})
+    } catch (err) {
+        res.status(400).json({message: err.message})
+    }
+
 })
 
 module.exports = router

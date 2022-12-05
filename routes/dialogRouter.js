@@ -6,16 +6,20 @@ const User = require('../models/User')
 
 router.get('/', async (req, res, next) => {
     try {
-        let dialogs = await Dialog.find({members_id: { "$in" : [req.headers["user-id"]]}}).then(dialogs => dialogs)
+        let dialogs = await Dialog.find({members_id: { "$in" : [req.headers["authorization"]]}}).then(dialogs => dialogs)
         for (let i = 0; i < dialogs.length; i++) {
             await Message.find({dialog_id: dialogs[i].id}).then(messages => {
                 dialogs[i] = {
-                    id: dialogs[i].id,
-                    members: dialogs[i].members_id,
+                    ...dialogs[i]._doc,
                     messages,
-                    creation_date: dialogs[i].creation_date
                 }
             })
+            dialogs[i].members = []
+            for (let member_id of dialogs[i].members_id) {
+                await User.findById(member_id).then( user =>
+                    dialogs[i].members.push(user)
+                )
+            }
         }
         res.send(dialogs)
     } catch (err) {
@@ -32,13 +36,13 @@ router.get('/:id', async (req, res, next) => {
 })
 
 router.post('/', async (req, res, next) => {
-    const dialog = await new Dialog({
-        members_id: []
-    })
-    for (let member_id of req.body.members_id) {
-        dialog.members_id.push(await User.findById(member_id).then(user => user._id))
-    }
     try {
+        const dialog = await new Dialog({
+            members_id: [await User.findById(req.headers["authorization"]).then(user => user._id)]
+        })
+        for (let member_id of req.body.members_id) {
+            dialog.members_id.push(await User.findById(member_id).then(user => user._id))
+        }
         const newDialog = await dialog.save()
         res.status(201).json(newDialog)
     } catch (err) {

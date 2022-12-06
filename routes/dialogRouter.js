@@ -6,22 +6,35 @@ const User = require('../models/User')
 
 router.get('/', async (req, res, next) => {
     try {
-        let dialogs = await Dialog.find({members_id: { "$in" : [req.headers["authorization"]]}}).then(dialogs => dialogs)
-        for (let i = 0; i < dialogs.length; i++) {
-            await Message.find({dialog_id: dialogs[i].id}).then(messages => {
+        await Dialog.find({members_id: { "$in" : [req.headers["authorization"]]}}).then(async dialogs => {
+            for (let i = 0; i < dialogs.length; i++) {
+                let message = null
+                await Message.find({dialog_id: dialogs[i].id}).sort({creation_date: -1}).limit(1).then(async messages => {
+                    if (messages[0]) {
+                        await User.findById(messages[0].sender_id).then(user =>
+                            messages[0] = {
+                                ...messages[0]._doc,
+                                sender: user,
+                            })
+                        message = messages[0]
+                    }
+                })
+                let members = []
+                for (let member_id of dialogs[i].members_id) {
+                    await User.findById(member_id).then( user => {
+                            members.push(user)
+                        }
+                    )
+                }
                 dialogs[i] = {
                     ...dialogs[i]._doc,
-                    messages,
+                    message,
+                    members,
                 }
-            })
-            dialogs[i].members = []
-            for (let member_id of dialogs[i].members_id) {
-                await User.findById(member_id).then( user =>
-                    dialogs[i].members.push(user)
-                )
             }
-        }
-        res.send(dialogs)
+            res.send(dialogs)
+        })
+
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -29,7 +42,7 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:id', async (req, res, next) => {
     try {
-        Dialog.findById(req.body.id).then(dialog => res.send(dialog))
+        Dialog.findById(req.params.id).then(dialog => res.send(dialog))
     } catch (err) {
         res.status(500).json({message: err.message})
     }

@@ -12,9 +12,20 @@ router.get('/', async (req, res, next) => {
     }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:dialog_id', async (req, res, next) => {
     try {
-        Message.findById(req.body.id).then(message => res.send(message))
+        await Message.find({dialog_id: req.params.dialog_id}).then(async messages => {
+            for (let i = 0; i < messages.length; i++) {
+                await User.findById(messages[i].sender_id).then(user => {
+                    messages[i] = {
+                        ...messages[i]._doc,
+                        sender: user
+                    }
+                })
+            }
+
+            res.send(messages)
+        })
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -28,8 +39,15 @@ router.post('/', async (req, res, next) => {
             text: req.body.text,
             image: req.body.image,
         })
-        const newMessage = await message.save()
-        res.status(201).json(newMessage)
+        let newMessage = await message.save()
+        await User.findById(newMessage.sender_id).then(user => {
+            newMessage = {
+                ...newMessage._doc,
+                sender: user
+            }
+            res.status(201).json(newMessage)
+        })
+
     } catch (err) {
         res.status(400).json({message: err.message})
     }

@@ -5,7 +5,8 @@ const schema = new mongoose.Schema({
     members_id: {
         type: [ObjectId],
         ref: 'User',
-        required: true
+        required: true,
+        unique: true
     },
     creation_date: {
         type: Date,

@@ -40,11 +40,11 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 ###
 POST http://localhost:3000/api/dialog
 Content-Type: application/json
-authorization: 638cb4f92fcb67b4aa2bfdf4
+authorization: 638cb3e62fcb67b4aa2bfdd0
 
 {
   "members_id": [
-    "638cb3e62fcb67b4aa2bfdd0"
+    "638cb4f92fcb67b4aa2bfdf4"
   ]
 }
 

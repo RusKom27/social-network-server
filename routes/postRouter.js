@@ -5,24 +5,35 @@ const User = require('../models/User')
 
 router.get('/', async (req, res, next) => {
     try {
-        let posts
-        if (req.headers.authorization)
-            posts = await Post.find({author_id: req.headers.authorization}).then(posts => posts)
-        else posts = await Post.find().then(posts => posts)
-        for (let i = 0; i < posts.length; i++) {
-            await User.findById(posts[i].author_id).then(user => {
-                posts[i] = {...posts[i]._doc, user}
-            })
-        }
-        res.json(posts)
+        await Post.find(
+            req.headers.authorization ? {author_id: req.headers.authorization} : {}
+        ).then(async posts => {
+            for (let i = 0; i < posts.length; i++) {
+                await User.findById(posts[i].author_id).then(user => {
+                    posts[i] = {...posts[i]._doc, user}
+                })
+            }
+            res.json(posts)
+        })
+
     } catch (err) {
         res.status(500).json({message: err.message})
     }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:user_login', async (req, res, next) => {
     try {
-        Post.findById(req.body.id).then(post => res.send(post))
+        User.findOne({login: req.params.user_login}).then(user => {
+            Post.find({author_id: user._id}).then(posts => {
+                for (let i = 0; i < posts.length; i++) {
+                    posts[i] = {
+                        ...posts[i]._doc,
+                        user: user
+                    }
+                }
+                res.send(posts)
+            })
+        })
     } catch (err) {
         res.status(500).json({message: err.message})
     }

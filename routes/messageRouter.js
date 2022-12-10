@@ -1,5 +1,7 @@
 const express = require('express')
 const router = express.Router()
+const getUser = require('../middleware/getUser')
+const getDialog = require('../middleware/getDialog')
 const Message = require('../models/Message')
 const Dialog = require('../models/Dialog')
 const User = require('../models/User')
@@ -31,21 +33,18 @@ router.get('/:dialog_id', async (req, res, next) => {
     }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/',getUser, getDialog, async (req, res, next) => {
     try {
         const message = await new Message({
-            sender_id: await User.findById(req.headers.authorization).then(user => user._id),
-            dialog_id: await Dialog.findById(req.body.dialog_id).then(dialog => dialog._id),
+            sender_id: req.user,
+            dialog_id: req.dialog,
             text: req.body.text,
             image: req.body.image,
         })
         let newMessage = await message.save()
-        await User.findById(newMessage.sender_id).then(user => {
-            newMessage = {
-                ...newMessage._doc,
-                sender: user
-            }
-            res.status(201).json(newMessage)
+        res.status(201).json({
+            ...newMessage,
+            sender: req.user
         })
 
     } catch (err) {

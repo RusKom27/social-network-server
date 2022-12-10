@@ -50,7 +50,6 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try {
-        console.log(Object.keys(res))
         Dialog.findOne({members_id: { "$all" : [req.headers["authorization"], ...req.body.members_id]}}).then(async dialog => {
             if (dialog) res.json(dialog)
             else {

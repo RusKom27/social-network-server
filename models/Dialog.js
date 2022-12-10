@@ -6,7 +6,6 @@ const schema = new mongoose.Schema({
         type: [ObjectId],
         ref: 'User',
         required: true,
-        unique: true
     },
     creation_date: {
         type: Date,

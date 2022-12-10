@@ -40,11 +40,11 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 ###
 POST http://localhost:3000/api/dialog
 Content-Type: application/json
-authorization: 638cb3e62fcb67b4aa2bfdd0
+authorization: 638d0f848c5159385112a242
 
 {
   "members_id": [
-    "638cb4f92fcb67b4aa2bfdf4"
+    "6390eb9941f9341b63588667"
   ]
 }
 
@@ -76,3 +76,15 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 
 DELETE http://localhost:3000/api/post/638cfec6108c2f607b60b456
 authorization: 638cb4f92fcb67b4aa2bfdf4
+
+###
+
+POST https://social-network-server-rho.vercel.app/api/dialog
+Content-Type: application/json
+authorization: 6390eb9941f9341b63588667
+
+{
+  "members_id": [
+    "638d10e8688ad92faf870be0"
+  ]
+}

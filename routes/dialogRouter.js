@@ -51,15 +51,14 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
     try {
         await Dialog.findOne({members_id: { "$all" : [req.headers["authorization"], ...req.body.members_id]}}).then(async dialog => {
-            if (dialog) res.json(dialog)
+            if (dialog) { res.json(dialog) }
             else {
-                const dialog = await new Dialog({
-                    members_id: [await User.findById(req.headers["authorization"]).then(user => user._id)]
-                })
+                let members_id = [await User.findById(req.headers["authorization"]).then( user => user._id)]
                 for (let member_id of req.body.members_id) {
-                    dialog.members_id.push(await User.findById(member_id).then(user => user._id))
+                    members_id.push(await User.findById(member_id).then(user => user._id))
                 }
-                const newDialog = await dialog.save()
+                let newDialog = new Dialog({members_id})
+                await newDialog.save()
                 res.json(newDialog)
             }
         })

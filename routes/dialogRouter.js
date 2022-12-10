@@ -50,7 +50,7 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try {
-        Dialog.findOne({members_id: { "$all" : [req.headers["authorization"], ...req.body.members_id]}}).then(async dialog => {
+        await Dialog.findOne({members_id: { "$all" : [req.headers["authorization"], ...req.body.members_id]}}).then(async dialog => {
             if (dialog) res.json(dialog)
             else {
                 const dialog = await new Dialog({
@@ -60,7 +60,7 @@ router.post('/', async (req, res, next) => {
                     dialog.members_id.push(await User.findById(member_id).then(user => user._id))
                 }
                 const newDialog = await dialog.save()
-                res.status(201).json(newDialog)
+                res.json(newDialog)
             }
         })
     } catch (err) {

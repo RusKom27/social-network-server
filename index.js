@@ -11,7 +11,7 @@ const corsOptions = {
     optionSuccessStatus: 200
 }
 
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(process.env.LOCAL_MONGO_URL)
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
 db.once('open', () => console.log('Connected to database...'))
@@ -26,6 +26,7 @@ app.use('/api/user', require('./routes/userRouter'))
 app.use('/api/post', require('./routes/postRouter'))
 app.use('/api/message', require('./routes/messageRouter'))
 app.use('/api/dialog', require('./routes/dialogRouter'))
+app.use('/api/image', require('./routes/imageRouter'))
 
 const debug = require('debug')('social_network:server')
 const http = require('http')

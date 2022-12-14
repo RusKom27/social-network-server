@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const ObjectId = mongoose.Types.ObjectId
 
 const schema = new mongoose.Schema({
     name: {
@@ -15,6 +16,10 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+    },
+    subscribers: {
+        type: [ObjectId],
+        default: []
     },
     password: {
         type: String,

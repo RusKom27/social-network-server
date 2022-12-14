@@ -60,7 +60,7 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 
 ###
 
-GET http://localhost:3000/api/post
+GET http://localhost:3000/api/post/
 
 ###
 
@@ -88,3 +88,8 @@ authorization: 6390eb9941f9341b63588667
     "638d10e8688ad92faf870be0"
   ]
 }
+
+###
+
+PUT http://localhost:3000/api/user/subscribe/user2
+authorization: 638cb4f92fcb67b4aa2bfdf4

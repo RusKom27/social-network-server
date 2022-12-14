@@ -35,7 +35,7 @@ app.set('port', port)
 
 const server = http.createServer(app)
 
-server.listen(port)
+server.listen(port, () => console.log(`Server started: http://localhost:${process.env.PORT || '3000'}`))
 server.on('error', onError)
 server.on('listening', onListening)
 

@@ -24,6 +24,8 @@ router.get('/', async (req, res, next) => {
 router.get('/:user_login', async (req, res, next) => {
     try {
         User.findOne({login: req.params.user_login}).then(user => {
+            if (!user) res.status(404).send({message: "User not found"})
+            else
             Post.find({author_id: user._id}).then(posts => {
                 for (let i = 0; i < posts.length; i++) {
                     posts[i] = {
@@ -76,10 +78,8 @@ router.delete('/:id', async (req, res, next) => {
     try {
         await Post.findOne({_id: req.params.id}).then(async post => {
             await User.findById(req.headers.authorization).then(user => {
-                console.log(post.author_id.toString() === user._id.toString())
+                if (post.author_id.toString() === user._id.toString()) post.delete()
             })
-
-            //post.delete()
         })
         res.json({_id: req.params.id})
     } catch (err) {

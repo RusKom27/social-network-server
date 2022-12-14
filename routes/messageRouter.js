@@ -33,7 +33,7 @@ router.get('/:dialog_id', async (req, res, next) => {
     }
 })
 
-router.post('/',getUser, getDialog, async (req, res, next) => {
+router.post('/', getUser, getDialog, async (req, res, next) => {
     try {
         const message = await new Message({
             sender_id: req.user,

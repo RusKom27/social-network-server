@@ -69,7 +69,7 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 
 ###
 
-PUT http://localhost:3000/api/post/like/638cb4fd2fcb67b4aa2bfdfb
+PUT http://localhost:3000/api/post/like/638dce155d24a175b1b9b2b3
 authorization: 638cb4f92fcb67b4aa2bfdf4
 
 ###
@@ -103,10 +103,9 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 {
   "login": "user1",
   "email": "user1@gmail.com",
-  "sdfsd": "wefwe",
   "password": "password1"
 }
 
 ###
 
-GET http://localhost:3000/images/rocky.png
+GET http://localhost:3000/api/image/user1_avatar.png

@@ -6,9 +6,11 @@ const schema = mongoose.Schema({
         require: true
     },
     image: {
-        data: Buffer,
-        contentType: String
+        type: Buffer,
     },
+    contentType: {
+        type: String
+    }
 }, {timestamps: true});
 
 module.exports = mongoose.model('Image', schema, 'images')

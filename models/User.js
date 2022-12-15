@@ -25,21 +25,21 @@ const schema = new mongoose.Schema({
         avatar_image: {
             big: {
                 type: String,
-                default: "default_big_avatar_image.png",
+                default: "default_big_avatar_image.jpg",
             },
             small: {
                 type: String,
-                default: "default_small_avatar_image.png",
+                default: "default_small_avatar_image.jpg",
             }
         },
         profile_image: {
             big: {
                 type: String,
-                default: "default_big_profile_image.png",
+                default: "default_big_profile_image.jpg",
             },
             small: {
                 type: String,
-                default: "default_small_profile_image.png",
+                default: "default_small_profile_image.jpg",
             }
         },
     },

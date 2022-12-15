@@ -17,6 +17,7 @@ const upload = multer({ storage: storage })
 
 router.post('/upload',upload.single('image'), async (req, res, next) => {
     try {
+        res.json(path.join(process.cwd(), 'public/images'))
         User.findByIdAndUpdate(
             req.headers.authorization,
             {

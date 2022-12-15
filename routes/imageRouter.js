@@ -6,7 +6,7 @@ const router = express.Router()
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(process.cwd(), 'public/images'))
+        cb(null, path.join(process.cwd(), 'images'))
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname)
@@ -17,7 +17,6 @@ const upload = multer({ storage: storage })
 
 router.post('/upload',upload.single('image'), async (req, res, next) => {
     try {
-        res.json(path.join(process.cwd(), 'public/images'))
         User.findByIdAndUpdate(
             req.headers.authorization,
             {
@@ -28,7 +27,8 @@ router.post('/upload',upload.single('image'), async (req, res, next) => {
                     }
                 }
             }).then(user => {
-                res.json(path.join(process.cwd(), 'public/images'))
+            console.log(path.join(process.cwd(), 'images'))
+            res.json(user)
         })
     } catch (err) {
         res.json({message: err.message})

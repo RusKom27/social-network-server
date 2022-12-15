@@ -96,4 +96,17 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 
 ###
 
+POST http://localhost:3000/api/user/update
+Content-Type: application/json
+authorization: 638cb4f92fcb67b4aa2bfdf4
+
+{
+  "login": "user1",
+  "email": "user1@gmail.com",
+  "sdfsd": "wefwe",
+  "password": "password1"
+}
+
+###
+
 GET http://localhost:3000/images/rocky.png

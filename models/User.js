@@ -17,6 +17,32 @@ const schema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    description: {
+        type: String,
+        default: "",
+    },
+    images: {
+        avatar_image: {
+            big: {
+                type: String,
+                default: "default_big_avatar_image.png",
+            },
+            small: {
+                type: String,
+                default: "default_small_avatar_image.png",
+            }
+        },
+        profile_image: {
+            big: {
+                type: String,
+                default: "default_big_profile_image.png",
+            },
+            small: {
+                type: String,
+                default: "default_small_profile_image.png",
+            }
+        },
+    },
     subscribers: {
         type: [ObjectId],
         default: []

@@ -26,6 +26,12 @@ router.get('/', async (req, res, next) => {
     }
 })
 
+router.post('/update', async (req, res, next) => {
+    User.findByIdAndUpdate(req.headers.authorization, req.body).then(user => {
+        res.json(user)
+    })
+})
+
 router.put('/subscribe/:user_login', getUser, async (req, res, next) => {
     try {
         if (req.params.user_login)

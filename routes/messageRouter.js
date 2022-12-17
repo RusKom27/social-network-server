@@ -6,9 +6,40 @@ const Message = require('../models/Message')
 const Dialog = require('../models/Dialog')
 const User = require('../models/User')
 
-router.get('/', async (req, res, next) => {
+const getDialogs = async (req) => {
+    return Dialog.find({members_id: { "$in" : [req.headers["authorization"]]}}).then(dialogs => dialogs)
+}
+
+const getMembers = async (members_id) => {
+    return User.find({_id: {"$in": members_id}}).then(users => users)
+}
+
+const getMessages = async (dialog_id) => {
+    return Message.find({dialog_id}).then(async messages => {
+        for (let i = 0; i < messages.length; i++) {
+            await User.findById(messages[i].sender_id).then(user => {
+                messages[i] = {
+                    ...messages[i]._doc,
+                    sender: user
+                }
+            })
+        }
+        return messages
+    })
+}
+
+router.get('/', getUser, async (req, res) => {
     try {
-        Message.find().then(messages => res.send(messages))
+        getDialogs(req).then(async dialogs => {
+            for (let i = 0; i < dialogs.length; i++) {
+                dialogs[i] = {
+                    ...dialogs[i]._doc,
+                    messages: await getMessages(dialogs[i]._id),
+                    members: await getMembers(dialogs[i].members_id)
+                }
+            }
+            res.send(dialogs)
+        })
     } catch (err) {
         res.status(500).json({message: err.message})
     }

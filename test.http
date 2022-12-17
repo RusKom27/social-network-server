@@ -38,6 +38,11 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 }
 
 ###
+
+GET http://localhost:3000/api/message
+authorization: 638cb4f92fcb67b4aa2bfdf4
+
+###
 POST http://localhost:3000/api/dialog
 Content-Type: application/json
 authorization: 638d0f848c5159385112a242

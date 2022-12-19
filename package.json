@@ -11,6 +11,7 @@
   "author": "RusKom",
   "license": "ISC",
   "dependencies": {
+    "ably": "^1.2.34",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "debug": "^4.3.4",

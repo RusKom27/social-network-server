@@ -28,6 +28,7 @@ Content-Type: application/json
 }
 
 ###
+
 POST http://localhost:3000/api/message
 Content-Type: application/json
 authorization: 639ec7225edf70d6e3d1057b
@@ -92,6 +93,17 @@ authorization: 6390eb9941f9341b63588667
   "members_id": [
     "638d10e8688ad92faf870be0"
   ]
+}
+
+###
+
+POST https://social-network-server-rho.vercel.app/api/message
+Content-Type: application/json
+authorization: 638d0f848c5159385112a242
+
+{
+  "dialog_id": "6394a26c785b9b2764d5ca47",
+  "text": "How are you?"
 }
 
 ###

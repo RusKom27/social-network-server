@@ -1,13 +1,16 @@
 const express = require('express')
+const Ably = require("ably");
+
 const getUser = require('../middleware/getUser')
 const getDialog = require('../middleware/getDialog')
 const Message = require('../models/Message')
 const Dialog = require('../models/Dialog')
 const User = require('../models/User')
-const events = require("events");
 
 const router = express.Router()
-const emitter = new events.EventEmitter()
+const realtime = new Ably.Realtime(process.env.ABLY_API_KEY);
+const channel = realtime.channels.get('messages');
+
 
 
 const getMembers = async (members_id) => {
@@ -29,7 +32,7 @@ const getMessages = async (dialog_id) => {
 }
 
 const getDialogs = async (req, res) => {
-    await Dialog.find({members_id: { "$in" : [req.params.token]}}).then(async dialogs => {
+    await Dialog.find({members_id: { "$in" : [req.headers.authorization]}}).then(async dialogs => {
         for (let i = 0; i < dialogs.length; i++) {
             dialogs[i] = {
                 ...dialogs[i]._doc,
@@ -37,20 +40,13 @@ const getDialogs = async (req, res) => {
                 members: await getMembers(dialogs[i].members_id)
             }
         }
-        res.write(`data: ${JSON.stringify(dialogs)} \n\n`)
+        res.json(dialogs)
     })
 }
 
-router.get('/connect/:token', async (req, res) => {
-    res.writeHead(200, {
-        'Connection': 'keep-alive',
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-    })
+router.get('/', getUser, async (req, res) => {
+    channel.publish("messages", "message data");
     await getDialogs(req, res)
-    emitter.on('newMessage', async message => {
-        await getDialogs(req, res)
-    })
 })
 
 router.get('/:dialog_id', async (req, res, next) => {
@@ -81,7 +77,7 @@ router.post('/', getUser, getDialog, async (req, res, next) => {
             image: req.body.image,
         })
         let newMessage = await message.save()
-        emitter.emit('newMessage', newMessage)
+        channel.publish("new_message", newMessage);
         res.status(201).json({
             ...newMessage._doc,
             sender: req.user

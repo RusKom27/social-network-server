@@ -27,7 +27,6 @@ app.use('/api/auth', require('./routes/authRouter'))
 app.use('/api/user', require('./routes/userRouter'))
 app.use('/api/post', require('./routes/postRouter'))
 app.use('/api/message', require('./routes/messageRouter'))
-app.use('/api/dialog', require('./routes/dialogRouter'))
 app.use('/api/image', require('./routes/imageRouter'))
 
 const debug = require('debug')('social_network:server')

@@ -9,9 +9,6 @@ const events = require("events");
 const router = express.Router()
 const emitter = new events.EventEmitter()
 
-const getDialogs = async (req) => {
-    return Dialog.find({members_id: { "$in" : [req.headers["authorization"]]}}).then(dialogs => dialogs)
-}
 
 const getMembers = async (members_id) => {
     return User.find({_id: {"$in": members_id}}).then(users => users)
@@ -31,8 +28,8 @@ const getMessages = async (dialog_id) => {
     })
 }
 
-const sendDialogs = async (req, res) => {
-    getDialogs(req).then(async dialogs => {
+const getDialogs = async (req, res) => {
+    await Dialog.find({members_id: { "$in" : [req.params.token]}}).then(async dialogs => {
         for (let i = 0; i < dialogs.length; i++) {
             dialogs[i] = {
                 ...dialogs[i]._doc,
@@ -40,28 +37,20 @@ const sendDialogs = async (req, res) => {
                 members: await getMembers(dialogs[i].members_id)
             }
         }
-        res.send(dialogs)
+        res.write(`data: ${JSON.stringify(dialogs)} \n\n`)
     })
 }
 
-router.get('/', getUser, async (req, res) => {
-    try {
-        if (req.headers.initial === "true") await sendDialogs(req, res)
-        else {
-            getDialogs(req).then(dialogs => {
-                dialogs.forEach(dialog => {
-                    emitter.once(dialog._id.toString(), async _ => {
-                        await sendDialogs(req, res)
-                    })
-                })
-                console.log(emitter)
-
-            })
-
-        }
-    } catch (err) {
-        res.status(500).json({message: err.message})
-    }
+router.get('/connect/:token', async (req, res) => {
+    res.writeHead(200, {
+        'Connection': 'keep-alive',
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+    })
+    await getDialogs(req, res)
+    emitter.on('newMessage', async message => {
+        await getDialogs(req, res)
+    })
 })
 
 router.get('/:dialog_id', async (req, res, next) => {
@@ -92,7 +81,7 @@ router.post('/', getUser, getDialog, async (req, res, next) => {
             image: req.body.image,
         })
         let newMessage = await message.save()
-        emitter.emit(message.dialog_id.toString(), {})
+        emitter.emit('newMessage', newMessage)
         res.status(201).json({
             ...newMessage._doc,
             sender: req.user

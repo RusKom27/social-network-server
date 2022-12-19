@@ -30,10 +30,10 @@ Content-Type: application/json
 ###
 POST http://localhost:3000/api/message
 Content-Type: application/json
-authorization: 638cb4f92fcb67b4aa2bfdf4
+authorization: 639ec7225edf70d6e3d1057b
 
 {
-  "dialog_id": "638dda7a0549a7286372f04e",
+  "dialog_id": "639ee9dbdae6114ff58fd445",
   "text": "How are you?"
 }
 

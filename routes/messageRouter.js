@@ -12,7 +12,6 @@ const realtime = new Ably.Realtime(process.env.ABLY_API_KEY);
 const channel = realtime.channels.get('messages');
 
 
-
 const getMembers = async (members_id) => {
     return User.find({_id: {"$in": members_id}}).then(users => users)
 }
@@ -31,8 +30,8 @@ const getMessages = async (dialog_id) => {
     })
 }
 
-const getDialogs = async (req, res) => {
-    await Dialog.find({members_id: { "$in" : [req.headers.authorization]}}).then(async dialogs => {
+const getDialogs = async (req) => {
+    return await Dialog.find({members_id: { "$in" : [req.headers.authorization]}}).then(async dialogs => {
         for (let i = 0; i < dialogs.length; i++) {
             dialogs[i] = {
                 ...dialogs[i]._doc,
@@ -40,32 +39,12 @@ const getDialogs = async (req, res) => {
                 members: await getMembers(dialogs[i].members_id)
             }
         }
-        res.json(dialogs)
+        return dialogs
     })
 }
 
 router.get('/', getUser, async (req, res) => {
-    channel.publish("messages", "message data");
-    await getDialogs(req, res)
-})
-
-router.get('/:dialog_id', async (req, res, next) => {
-    try {
-        await Message.find({dialog_id: req.params.dialog_id}).then(async messages => {
-            for (let i = 0; i < messages.length; i++) {
-                await User.findById(messages[i].sender_id).then(user => {
-                    messages[i] = {
-                        ...messages[i]._doc,
-                        sender: user
-                    }
-                })
-            }
-
-            res.send(messages)
-        })
-    } catch (err) {
-        res.status(500).json({message: err.message})
-    }
+    getDialogs(req).then(dialogs => res.json(dialogs))
 })
 
 router.post('/', getUser, getDialog, async (req, res, next) => {
@@ -77,7 +56,7 @@ router.post('/', getUser, getDialog, async (req, res, next) => {
             image: req.body.image,
         })
         let newMessage = await message.save()
-        channel.publish("new_message", newMessage);
+        channel.publish("new_message", await getDialogs(req));
         res.status(201).json({
             ...newMessage._doc,
             sender: req.user
@@ -99,7 +78,8 @@ router.post('/create_dialog', async (req, res, next) => {
                 }
                 let newDialog = new Dialog({members_id})
                 await newDialog.save()
-                res.json(dialog)
+                channel.publish("new_dialog", await getDialogs(req));
+                res.json(newDialog)
             }
         })
     } catch (err) {

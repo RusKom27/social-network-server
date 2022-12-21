@@ -1,10 +1,13 @@
 const express = require('express')
-const events = require('events')
+const Ably = require("ably");
+
 const Post = require('../models/Post')
 const User = require('../models/User')
 const getUser = require('../middleware/getUser')
+
 const router = express.Router()
-const emitter = new events.EventEmitter()
+const realtime = new Ably.Realtime(process.env.ABLY_API_KEY);
+const channel = realtime.channels.get('posts');
 
 router.get('/', async (req, res, next) => {
     try {
@@ -22,13 +25,6 @@ router.get('/', async (req, res, next) => {
     } catch (err) {
         res.status(500).json({message: err.message})
     }
-})
-
-router.get('/check_updates', async (req, res, next) => {
-    emitter.once('new_post', post => {
-        console.log(post)
-        res.json(post)
-    })
 })
 
 router.get('/:user_login', async (req, res, next) => {
@@ -60,26 +56,27 @@ router.post('/', getUser, async (req, res) => {
             image: req.body.image,
         })
         let newPost = await post.save()
-        emitter.emit('new_post', newPost)
-        res.status(201).json({...newPost._doc, user: req.user })
+        newPost = {...newPost._doc, user: req.user }
+        channel.publish("new_post", newPost);
+        res.status(201).json(newPost)
     } catch (err) {
         res.status(400).json({message: err.message})
     }
 })
 
-router.put('/like/:id', async (req, res) => {
+router.put('/like/:id', getUser, async (req, res) => {
     try {
-        const user = await User.findById(req.headers.authorization).then(user => user)
         let post = await Post.findById(req.params.id).then(post => post)
 
-        const user_index = post.likes.indexOf(user._id)
+        const user_index = post.likes.indexOf(req.user._id)
         if (user_index > -1) post.likes.splice(user_index, 1)
-        else post.likes.push(user._id)
+        else post.likes.push(req.user._id)
 
         let author_user = await User.findById(post.author_id).then(user => user)
         let newPost = await post.save()
-
-        res.status(201).json({...newPost._doc, user: author_user})
+        newPost = {...newPost._doc, user: author_user}
+        channel.publish("post_like", newPost);
+        res.status(201).json(newPost)
     } catch (err) {
         res.status(400).json({message: err.message})
     }
@@ -91,8 +88,10 @@ router.delete('/:id', async (req, res, next) => {
             await User.findById(req.headers.authorization).then(user => {
                 if (post.author_id.toString() === user._id.toString()) post.delete()
             })
+
+            channel.publish("delete_post", post);
+            res.json(post)
         })
-        res.json({_id: req.params.id})
     } catch (err) {
         res.status(400).json({message: err.message})
     }

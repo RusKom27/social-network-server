@@ -13,10 +13,10 @@ router.get('/', async (req, res, next) => {
     try {
         await Post.find(
             req.headers.authorization ? {author_id: req.headers.authorization} : {}
-        ).then(async posts => {
+        ).lean().then(async posts => {
             for (let i = 0; i < posts.length; i++) {
                 await User.findById(posts[i].author_id).then(user => {
-                    posts[i] = {...posts[i]._doc, user}
+                    posts[i] = {...posts[i], user}
                 })
             }
             res.json(posts)
@@ -32,10 +32,10 @@ router.get('/:user_login', async (req, res, next) => {
         User.findOne({login: req.params.user_login}).then(user => {
             if (!user) res.status(404).send({message: "User not found"})
             else {
-                Post.find({author_id: user._id}).then(posts => {
+                Post.find({author_id: user._id}).lean().then(posts => {
                     for (let i = 0; i < posts.length; i++) {
                         posts[i] = {
-                            ...posts[i]._doc,
+                            ...posts[i],
                             user: user
                         }
                     }

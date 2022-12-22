@@ -125,4 +125,4 @@ authorization: 638cb4f92fcb67b4aa2bfdf4
 
 ###
 
-GET http://localhost:3000/api/image/user1_avatar.gif
+GET http://localhost:3000/api/image/user2_avatar.png

@@ -7,11 +7,11 @@ const getUsers = async (users_id) => {
 }
 
 const getMessages = async (dialog_id) => {
-    return Message.find({dialog_id}).then(async messages => {
+    return Message.find({dialog_id}).lean().then(async messages => {
         for (let i = 0; i < messages.length; i++) {
             await User.findById(messages[i].sender_id).then(user => {
                 messages[i] = {
-                    ...messages[i]._doc,
+                    ...messages[i],
                     sender: user
                 }
             })
@@ -21,9 +21,9 @@ const getMessages = async (dialog_id) => {
 }
 
 const getDialog = async (dialog_id) => {
-    return await Dialog.findById(dialog_id).then(async dialog => {
+    return await Dialog.findById(dialog_id).lean().then(async dialog => {
         return {
-            ...dialog._doc,
+            ...dialog,
             messages: await getMessages(dialog._id),
             members: await getUsers(dialog.members_id)
         }

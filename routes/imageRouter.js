@@ -26,14 +26,11 @@ router.post('/upload', upload.single('image'), async (req, res, next) => {
 
 router.get('/:filename', (req, res) => {
     try {
-        Image.findOne({name: req.params.filename}).then(item => {
-            res.send({
-                ...item._doc,
-                image: item.image.toBSON()
-            });
+        Image.findOne({name: req.params.filename}).lean().then(item => {
+            res.send(item);
         }).catch(reason => res.json({message: reason.message}));
     } catch (err) {
-        res.json({message: err.message})
+        res.status(500).json({message: err.message})
     }
 
 });

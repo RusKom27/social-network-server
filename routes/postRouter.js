@@ -9,7 +9,7 @@ const router = express.Router()
 const realtime = new Ably.Realtime(process.env.ABLY_API_KEY);
 const channel = realtime.channels.get('posts');
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
     try {
         await Post.find(
             req.headers.authorization ? {author_id: req.headers.authorization} : {}
@@ -27,7 +27,7 @@ router.get('/', async (req, res, next) => {
     }
 })
 
-router.get('/:user_login', async (req, res, next) => {
+router.get('/:user_login', async (req, res) => {
     try {
         User.findOne({login: req.params.user_login}).then(user => {
             if (!user) res.status(404).send({message: "User not found"})
@@ -82,7 +82,7 @@ router.put('/like/:id', getUser, async (req, res) => {
     }
 })
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', async (req, res) => {
     try {
         await Post.findOne({_id: req.params.id}).then(async post => {
             await User.findById(req.headers.authorization).then(user => {

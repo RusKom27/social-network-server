@@ -1,23 +1,25 @@
 const express = require('express')
 const multer = require('multer');
-const User = require("../models/User");
 const Image = require("../models/Image");
-const path = require("path");
-const fs = require('fs');
 
 const router = express.Router()
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage })
 
-router.post('/upload', upload.single('image'), async (req, res, next) => {
+router.post('/upload', upload.single('image'), async (req, res) => {
     try {
-        const image = {
+        const new_image = {
             name: req.file.originalname,
             image: new Buffer.from(req.file.buffer, 'base64'),
             contentType: req.file.mimetype,
         }
-        Image.create(image).then(image => {
-            res.send(image)
+        Image.findOne({name: new_image.name}).then(image => {
+            if (image) {
+                image.image = new_image.image
+                image.save()
+                res.send(image)
+            }
+            else Image.create(new_image).then(image => res.send(image))
         })
     } catch (err) {
         res.json({message: err.message})

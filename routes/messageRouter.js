@@ -15,7 +15,7 @@ router.get('/', getUser, async (req, res) => {
     getDialogs([req.headers.authorization]).then(dialogs => res.json(dialogs))
 })
 
-router.post('/', getUser, async (req, res, next) => {
+router.post('/', getUser, async (req, res) => {
     try {
         const message = await new Message({
             sender_id: req.user._id,
@@ -35,7 +35,7 @@ router.post('/', getUser, async (req, res, next) => {
     }
 })
 
-router.post('/create_dialog', async (req, res, next) => {
+router.post('/create_dialog', async (req, res) => {
     try {
         await Dialog.findOne({members_id: { "$all" : [req.headers["authorization"], ...req.body.members_id]}}).then(async dialog => {
             if (dialog) { res.json(dialog) }

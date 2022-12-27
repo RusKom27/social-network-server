@@ -20,6 +20,10 @@ const schema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    checked: {
+        type: Boolean,
+        default: false,
+    },
     creation_date: {
         type: Date,
         default: Date.now

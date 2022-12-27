@@ -15,6 +15,21 @@ router.get('/', getUser, async (req, res) => {
     getDialogs([req.headers.authorization]).then(dialogs => res.json(dialogs))
 })
 
+router.put('/check/:id', getUser, async (req, res) => {
+    console.log(req.params.id)
+    try {
+        Message.findById(req.params.id).then(async message => {
+            message.checked = true
+            await message.save()
+            res.status(200).json(message)
+            channel.publish("check_message", await getDialog(message.dialog_id));
+        })
+    } catch (err) {
+        res.status(400).json({message: err.message})
+    }
+
+})
+
 router.post('/', getUser, async (req, res) => {
     try {
         const message = await new Message({

@@ -6,6 +6,18 @@ const getUsers = async (users_id) => {
     return User.find({_id: {"$in": users_id}}).then(users => users)
 }
 
+const getMessage = async (message_id) => {
+    return Message.findById(message_id).lean().then(async message => {
+        await User.findById(message.sender_id).then(user => {
+            message = {
+                ...message,
+                sender: user
+            }
+        })
+        return message
+    })
+}
+
 const getMessages = async (dialog_id) => {
     return Message.find({dialog_id}).lean().then(async messages => {
         for (let i = 0; i < messages.length; i++) {
@@ -41,6 +53,7 @@ const getDialogs = async (members_id) => {
 
 module.exports = {
     getUsers,
+    getMessage,
     getMessages,
     getDialog,
     getDialogs

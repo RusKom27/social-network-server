@@ -28,7 +28,6 @@ router.get('/', async (req, res) => {
 
 router.post('/update', async (req, res) => {
     User.findByIdAndUpdate(req.headers.authorization, req.body).then(user => {
-        console.log(user)
         res.json(user)
     })
 })

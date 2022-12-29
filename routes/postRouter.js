@@ -1,13 +1,11 @@
 const express = require('express')
-const Ably = require("ably");
 
 const Post = require('../models/Post')
 const User = require('../models/User')
 const getUser = require('../middleware/getUser')
+const AblyChannels = require("../packages/ably")
 
 const router = express.Router()
-const realtime = new Ably.Realtime(process.env.ABLY_API_KEY);
-const channel = realtime.channels.get('posts');
 
 router.get('/', async (req, res) => {
     try {
@@ -57,7 +55,7 @@ router.post('/', getUser, async (req, res) => {
         })
         let newPost = await post.save()
         newPost = {...newPost._doc, user: req.user }
-        channel.publish("new_post", newPost);
+        AblyChannels.posts_channel.publish("new_post", newPost);
         res.status(201).json(newPost)
     } catch (err) {
         res.status(400).json({message: err.message})
@@ -75,7 +73,7 @@ router.put('/like/:id', getUser, async (req, res) => {
         let author_user = await User.findById(post.author_id).then(user => user)
         let newPost = await post.save()
         newPost = {...newPost._doc, user: author_user}
-        channel.publish("post_like", newPost);
+        AblyChannels.posts_channel.publish("post_like", newPost);
         res.status(201).json(newPost)
     } catch (err) {
         res.status(400).json({message: err.message})
@@ -89,7 +87,7 @@ router.delete('/:id', async (req, res) => {
                 if (post.author_id.toString() === user._id.toString()) post.delete()
             })
 
-            channel.publish("delete_post", post);
+            AblyChannels.posts_channel.publish("delete_post", post);
             res.json(post)
         })
     } catch (err) {

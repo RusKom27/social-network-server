@@ -1,28 +1,25 @@
 const express = require('express')
-const Ably = require("ably");
 
 const getUser = require('../middleware/getUser')
 const Message = require('../models/Message')
 const Dialog = require('../models/Dialog')
 const User = require('../models/User')
-const {getDialogs, getDialog} = require("../helpers");
+const {getDialogs, getDialog, getMessage} = require("../helpers");
+const AblyChannels = require("../packages/ably");
 
 const router = express.Router()
-const realtime = new Ably.Realtime(process.env.ABLY_API_KEY);
-const channel = realtime.channels.get('messages');
 
 router.get('/', getUser, async (req, res) => {
     getDialogs([req.headers.authorization]).then(dialogs => res.json(dialogs))
 })
 
 router.put('/check/:id', getUser, async (req, res) => {
-    console.log(req.params.id)
     try {
         Message.findById(req.params.id).then(async message => {
             message.checked = true
             await message.save()
+            AblyChannels.messages_channel.publish("check_message", await getMessage(message._id), (error) => console.log(error));
             res.status(200).json(message)
-            channel.publish("check_message", await getDialog(message.dialog_id));
         })
     } catch (err) {
         res.status(400).json({message: err.message})
@@ -39,7 +36,7 @@ router.post('/', getUser, async (req, res) => {
             image: req.body.image,
         })
         let newMessage = await message.save()
-        channel.publish("new_message", await getDialog(newMessage.dialog_id));
+        AblyChannels.messages_channel.publish("new_message", await getMessage(newMessage._id));
         res.status(201).json({
             ...newMessage._doc,
             sender: req.user
@@ -61,7 +58,7 @@ router.post('/create_dialog', async (req, res) => {
                 }
                 let newDialog = new Dialog({members_id})
                 await newDialog.save()
-                channel.publish("new_dialog", await getDialog(newDialog._id));
+                AblyChannels.messages_channel.publish("new_dialog", await getDialog(newDialog._id));
                 res.json(newDialog)
             }
         })

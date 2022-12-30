@@ -4,6 +4,8 @@ const Post = require('../models/Post')
 const User = require('../models/User')
 const getUser = require('../middleware/getUser')
 const AblyChannels = require("../packages/ably")
+const Message = require("../models/Message");
+const {getMessage} = require("../helpers");
 
 const router = express.Router()
 
@@ -62,19 +64,36 @@ router.post('/', getUser, async (req, res) => {
     }
 })
 
+router.put('/check/:id', getUser, async (req, res) => {
+    try {
+        Post.findById(req.params.id).then(async post => {
+            if (!post.views.includes(req.user._id)) post.views.push(req.user._id)
+            await post.save()
+            const author_user = await User.findById(post.author_id).then(user => user)
+            AblyChannels.posts_channel.publish(
+                "check_post",
+                {...post._doc, user: author_user },
+                (error) => console.log(error));
+            res.status(200).json({...post._doc, user: author_user })
+        })
+    } catch (err) {
+        res.status(400).json({message: err.message})
+    }
+
+})
+
 router.put('/like/:id', getUser, async (req, res) => {
     try {
-        let post = await Post.findById(req.params.id).then(post => post)
+        await Post.findById(req.params.id).then(async post => {
+            const user_index = post.likes.indexOf(req.user._id)
+            if (user_index > -1) post.likes.splice(user_index, 1)
+            else post.likes.push(req.user._id)
 
-        const user_index = post.likes.indexOf(req.user._id)
-        if (user_index > -1) post.likes.splice(user_index, 1)
-        else post.likes.push(req.user._id)
-
-        let author_user = await User.findById(post.author_id).then(user => user)
-        let newPost = await post.save()
-        newPost = {...newPost._doc, user: author_user}
-        AblyChannels.posts_channel.publish("post_like", newPost);
-        res.status(201).json(newPost)
+            const author_user = await User.findById(post.author_id).then(user => user)
+            await post.save()
+            AblyChannels.posts_channel.publish("post_like", {...post._doc, user: author_user});
+            res.status(201).json({...post._doc, user: author_user})
+        })
     } catch (err) {
         res.status(400).json({message: err.message})
     }

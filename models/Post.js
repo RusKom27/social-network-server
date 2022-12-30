@@ -20,6 +20,11 @@ const schema = new mongoose.Schema({
         ref: 'User',
         default: []
     },
+    views: {
+        type: [ObjectId],
+        ref: 'User',
+        default: [],
+    },
     creation_date: {
         type: Date,
         default: Date.now

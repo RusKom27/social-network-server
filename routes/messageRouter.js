@@ -4,7 +4,7 @@ const getUser = require('../middleware/getUser')
 const Message = require('../models/Message')
 const Dialog = require('../models/Dialog')
 const User = require('../models/User')
-const {getDialogs, getDialog, getMessage} = require("../helpers");
+const {getDialogs, getDialog, getMessage} = require("../helpers/database");
 const AblyChannels = require("../packages/ably");
 
 const router = express.Router()

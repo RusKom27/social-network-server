@@ -20,6 +20,10 @@ const schema = new mongoose.Schema({
         ref: 'User',
         default: []
     },
+    tags: {
+        type: [String],
+        default: []
+    },
     views: {
         type: [ObjectId],
         ref: 'User',

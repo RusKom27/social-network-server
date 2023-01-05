@@ -4,8 +4,7 @@ const Post = require('../models/Post')
 const User = require('../models/User')
 const getUser = require('../middleware/getUser')
 const AblyChannels = require("../packages/ably")
-const Message = require("../models/Message");
-const {getMessage} = require("../helpers");
+const {getTagsFromText} = require("../helpers/misc");
 
 const router = express.Router()
 
@@ -50,10 +49,12 @@ router.get('/:user_login', async (req, res) => {
 
 router.post('/', getUser, async (req, res) => {
     try {
+
         let post = await new Post({
             author_id: req.user._id,
             text: req.body.text,
             image: req.body.image,
+            tags: getTagsFromText(req.body.text)
         })
         let newPost = await post.save()
         newPost = {...newPost._doc, user: req.user }

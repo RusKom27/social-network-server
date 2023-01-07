@@ -5,6 +5,7 @@ const User = require('../models/User')
 const getUser = require('../middleware/getUser')
 const AblyChannels = require("../packages/ably")
 const {getTagsFromText} = require("../helpers/misc");
+const {getUsers} = require("../helpers/database");
 
 const router = express.Router()
 
@@ -23,6 +24,27 @@ router.get('/', async (req, res) => {
 
     } catch (err) {
         res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/popular_tags', async (req, res) => {
+    try {
+        let tags = {}
+        await Post.find().then(async posts => {
+            for (const post of posts) {
+                for (const tag of post.tags) {
+                    tags[tag] = tags[tag] ? tags[tag] + 1 : 1
+                }
+            }
+            let sorted_tags = Object.entries(tags)
+            sorted_tags.sort((first, second) => {
+                return first[1] - second[1]
+            })
+            sorted_tags = sorted_tags.map(tag => ({[tag[0]]: tag[1]})).reverse().slice(0,10)
+            res.status(200).send(sorted_tags)
+        })
+    } catch (err) {
+        res.status(400).json({message: err.message})
     }
 })
 
@@ -49,7 +71,6 @@ router.get('/:user_login', async (req, res) => {
 
 router.post('/', getUser, async (req, res) => {
     try {
-
         let post = await new Post({
             author_id: req.user._id,
             text: req.body.text,
@@ -113,7 +134,8 @@ router.delete('/:id', async (req, res) => {
     } catch (err) {
         res.status(400).json({message: err.message})
     }
-
 })
+
+
 
 module.exports = router

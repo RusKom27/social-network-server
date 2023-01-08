@@ -4,7 +4,7 @@ const Post = require('../models/Post')
 const User = require('../models/User')
 const getUser = require('../middleware/getUser')
 const AblyChannels = require("../packages/ably")
-const {getTagsFromText} = require("../helpers/misc");
+const {getTagsFromText, deletePunctuationMarks} = require("../helpers/misc");
 const {getUsers} = require("../helpers/database");
 
 const router = express.Router()
@@ -40,8 +40,36 @@ router.get('/popular_tags', async (req, res) => {
             sorted_tags.sort((first, second) => {
                 return first[1] - second[1]
             })
-            sorted_tags = sorted_tags.map(tag => ({[tag[0]]: tag[1]})).reverse().slice(0,10)
+            sorted_tags = sorted_tags
+                .map(tag => ({[tag[0]]: tag[1]}))
+                .reverse()
+                .slice(0,10)
             res.status(200).send(sorted_tags)
+        })
+    } catch (err) {
+        res.status(400).json({message: err.message})
+    }
+})
+
+router.get('/actual_topics', async (req, res) => {
+    try {
+        let topics = {}
+        await Post.find().then(async posts => {
+            for (const post of posts) {
+                for (const word of post.text.split(" ")) {
+                    const topic = deletePunctuationMarks(word)
+                    topics[topic] = topics[topic] ? topics[topic] + 1 : 1
+                }
+            }
+            let sorted_topics = Object.entries(topics)
+            sorted_topics.sort((first, second) => {
+                return first[1] - second[1]
+            })
+            sorted_topics = sorted_topics
+                .map(topic => ({[topic[0]]: topic[1]}))
+                .reverse()
+                .slice(0,10)
+            res.status(200).send(sorted_topics)
         })
     } catch (err) {
         res.status(400).json({message: err.message})

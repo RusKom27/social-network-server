@@ -1,15 +1,12 @@
-import {Request, Response, NextFunction, Router} from "express";
+import {Request, Response, NextFunction} from "express";
+import AblyChannels from "../packages/ably";
 import express from "express";
 import Post from "../models/Post";
 import User from "../models/User";
 
-import {Types} from "ably";
-import ErrorInfo = Types.ErrorInfo;
-
-const AblyChannels = require("../packages/ably")
 const {getTagsFromText, deletePunctuationMarks} = require("../helpers/misc");
 
-const router: Router = express.Router()
+const router = express.Router()
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -56,23 +53,22 @@ router.get('/popular_tags', async (req: Request, res: Response, next: NextFuncti
 router.get('/actual_topics', async (req: Request, res: Response, next: NextFunction) => {
     try {
         let topics: any = {}
-        await Post.find().then(async posts => {
-            for (const post of posts) {
-                for (const word of post.text.split(" ")) {
-                    const topic = deletePunctuationMarks(word)
-                    topics[topic] = topics[topic] ? topics[topic] + 1 : 1
-                }
+        const posts = await Post.find().exec()
+        for (const post of posts) {
+            for (const word of post.text.split(" ")) {
+                const topic = deletePunctuationMarks(word)
+                topics[topic] = topics[topic] ? topics[topic] + 1 : 1
             }
-            let sorted_topics = Object.entries(topics)
-            sorted_topics.sort((first: any, second: any) => {
-                return first[1] - second[1]
-            })
-            const result = sorted_topics
-                .map(topic => ({[topic[0]]: topic[1]}))
-                .reverse()
-                .slice(0,10)
-            res.status(200).send(result)
+        }
+        let sorted_topics = Object.entries(topics)
+        sorted_topics.sort((first: any, second: any) => {
+            return first[1] - second[1]
         })
+        const result = sorted_topics
+            .map(topic => ({[topic[0]]: topic[1]}))
+            .reverse()
+            .slice(0,10)
+        res.status(200).send(result)
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
@@ -132,8 +128,8 @@ router.put('/check/:id', async (req: Request, res: Response, next: NextFunction)
         const author_user = await User.findById(post.author_id).then(user => user)
         AblyChannels.posts_channel.publish(
             "check_post",
-            {...post, user: author_user },
-            (error: ErrorInfo) => console.log(error));
+            {...post, user: author_user }
+        );
         res.status(200).json({...post, user: author_user })
 
     } catch (err: any) {
@@ -177,6 +173,4 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
     next()
 })
 
-
-
-module.exports = router
+export default router

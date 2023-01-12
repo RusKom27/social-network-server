@@ -3,6 +3,8 @@ import mongoose from "mongoose"
 import bodyParser from 'body-parser'
 import express from 'express'
 
+import {authRouter, userRouter, searchRouter, imageRouter, postRouter, messageRouter} from "./routes"
+
 const cors = require('cors')
 const logger = require('morgan')
 const corsOptions = {
@@ -22,12 +24,12 @@ app.use(cors(corsOptions))
 app.use(logger('dev'))
 app.use(express.static("public"))
 
-app.use('/api/auth', require('./routes/authRouter'))
-app.use('/api/user', require('./routes/userRouter'))
-app.use('/api/post', require('./routes/postRouter'))
-app.use('/api/message', require('./routes/messageRouter'))
-app.use('/api/image', require('./routes/imageRouter'))
-app.use('/api/search', require('./routes/searchRouter'))
+app.use('/api/auth', authRouter)
+app.use('/api/user', userRouter)
+app.use('/api/post', postRouter)
+app.use('/api/message', messageRouter)
+app.use('/api/image', imageRouter)
+app.use('/api/search', searchRouter)
 
 const debug = require('debug')('social_network:server')
 const http = require('http')

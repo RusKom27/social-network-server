@@ -1,14 +1,14 @@
-const mongoose = require('mongoose')
-const ObjectId = mongoose.Types.ObjectId
+import mongoose, {Schema, Types} from "mongoose"
+import IMessage from "../interfaces/Message";
 
-const schema = new mongoose.Schema({
+const MessageSchema: Schema = new Schema({
     sender_id: {
-        type: ObjectId,
+        type: Types.ObjectId,
         ref: 'User',
         required: true
     },
     dialog_id: {
-        type: ObjectId,
+        type: Types.ObjectId,
         ref: 'Dialog',
         required: true
     },
@@ -30,4 +30,4 @@ const schema = new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Message', schema, 'messages')
+export default mongoose.model<IMessage>('Message', MessageSchema, 'messages')

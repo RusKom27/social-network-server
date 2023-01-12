@@ -1,8 +1,8 @@
-import {Request, Response, NextFunction, Router} from "express";
+import {Request, Response, NextFunction} from "express";
 import express from "express";
 import User from "../models/User";
 
-const router: Router = express.Router()
+const router = express.Router()
 
 router.get('/:login', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -43,7 +43,7 @@ router.put('/subscribe/:user_login', async (req: Request, res: Response, next: N
         if (!user) return res.status(404).send({message: "User not found"})
         if (user.subscribers.indexOf(current_user._id) < 0) {
             user.subscribers.push(current_user._id)
-            user.save()
+            await user.save()
             res.status(200).json({
                 ...user,
                 subscribers: [
@@ -52,7 +52,7 @@ router.put('/subscribe/:user_login', async (req: Request, res: Response, next: N
             })
         } else {
             user.subscribers = user.subscribers.filter((user_id) => !user_id.equals(current_user._id))
-            user.save()
+            await user.save()
             res.json(user)
         }
     } catch (err: any) {
@@ -61,4 +61,4 @@ router.put('/subscribe/:user_login', async (req: Request, res: Response, next: N
     next()
 })
 
-module.exports = router
+export default router

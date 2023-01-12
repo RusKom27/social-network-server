@@ -1,19 +1,21 @@
-const express = require('express')
+import {Request, Response, NextFunction, Router} from "express";
+import express from "express";
+import User from "../models/User";
 
-const getUser = require('../middleware/getUser')
+const router: Router = express.Router()
+
 const Message = require('../models/Message')
 const Dialog = require('../models/Dialog')
-const User = require('../models/User')
 const {getDialogs, getDialog, getMessage} = require("../helpers/database");
 const AblyChannels = require("../packages/ably");
 
-const router = express.Router()
-
-router.get('/', getUser, async (req, res) => {
+router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+    const user = await User.findById(req.headers.authorization).exec()
+    if (!user) return res.status(404).send({message: "User not found"})
     getDialogs([req.headers.authorization]).then(dialogs => res.json(dialogs))
 })
 
-router.put('/check/:id', getUser, async (req, res) => {
+router.put('/check/:id', getUser, async (req: Request, res: Response, next: NextFunction) => {
     try {
         Message.findById(req.params.id).then(async message => {
             message.checked = true
@@ -21,13 +23,13 @@ router.put('/check/:id', getUser, async (req, res) => {
             AblyChannels.messages_channel.publish("check_message", await getMessage(message._id), (error) => console.log(error));
             res.status(200).json(message)
         })
-    } catch (err) {
+    } catch (err: any) {
         res.status(400).json({message: err.message})
     }
 
 })
 
-router.post('/', getUser, async (req, res) => {
+router.post('/', getUser, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const message = await new Message({
             sender_id: req.user._id,
@@ -42,12 +44,12 @@ router.post('/', getUser, async (req, res) => {
             sender: req.user
         })
 
-    } catch (err) {
+    } catch (err: any) {
         res.status(400).json({message: err.message})
     }
 })
 
-router.post('/create_dialog', async (req, res) => {
+router.post('/create_dialog', async (req: Request, res: Response, next: NextFunction) => {
     try {
         await Dialog.findOne({members_id: { "$all" : [req.headers["authorization"], ...req.body.members_id]}}).then(async dialog => {
             if (dialog) { res.json(dialog) }
@@ -62,7 +64,7 @@ router.post('/create_dialog', async (req, res) => {
                 res.json(newDialog)
             }
         })
-    } catch (err) {
+    } catch (err: any) {
         res.status(400).json({message: err.message})
     }
 })

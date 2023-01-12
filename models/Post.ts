@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
-const ObjectId = mongoose.Types.ObjectId
+import mongoose, {Schema, Types} from "mongoose"
+import IPost from "../interfaces/Post";
 
-const schema = new mongoose.Schema({
+const PostSchema: Schema = new Schema({
     author_id: {
-        type: ObjectId,
+        type: Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -16,7 +16,7 @@ const schema = new mongoose.Schema({
         default: "",
     },
     likes: {
-        type: [ObjectId],
+        type: [Types.ObjectId],
         ref: 'User',
         default: []
     },
@@ -25,7 +25,7 @@ const schema = new mongoose.Schema({
         default: []
     },
     views: {
-        type: [ObjectId],
+        type: [Types.ObjectId],
         ref: 'User',
         default: [],
     },
@@ -35,4 +35,4 @@ const schema = new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Post', schema, 'posts')
+export default mongoose.model<IPost>('Post', PostSchema, 'posts')

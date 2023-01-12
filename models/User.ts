@@ -1,7 +1,7 @@
-const mongoose = require('mongoose')
-const ObjectId = mongoose.Types.ObjectId
+import mongoose, {Schema, Types} from "mongoose"
+import IUser from "../interfaces/User";
 
-const schema = new mongoose.Schema({
+const UserSchema: Schema = new Schema({
     name: {
         type: String,
         required: true,
@@ -44,7 +44,7 @@ const schema = new mongoose.Schema({
         },
     },
     subscribers: {
-        type: [ObjectId],
+        type: [Types.ObjectId],
         default: []
     },
     password: {
@@ -57,4 +57,4 @@ const schema = new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('User', schema, 'users')
+export default mongoose.model<IUser>('User', UserSchema, 'users')

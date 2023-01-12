@@ -1,20 +1,19 @@
-require('dotenv').config()
-const express = require('express')
-const app = express()
-const mongoose = require('mongoose')
+import config from "./config/config"
+import mongoose from "mongoose"
+import bodyParser from 'body-parser'
+import express from 'express'
+
 const cors = require('cors')
 const logger = require('morgan')
-const bodyParser = require('body-parser');
-
 const corsOptions = {
     credentials: true,
     optionSuccessStatus: 200
 }
 
-mongoose.connect(process.env.MONGO_URL)
-const db = mongoose.connection
-db.on('error', (error) => console.error(error))
-db.once('open', () => console.log('Connected to database...'))
+const app = express()
+
+mongoose.connect(config.mongo_url).then(r => console.log('Connected to database...'))
+mongoose.connection.on('error', (error: mongoose.Error) => console.error(error))
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -28,11 +27,12 @@ app.use('/api/user', require('./routes/userRouter'))
 app.use('/api/post', require('./routes/postRouter'))
 app.use('/api/message', require('./routes/messageRouter'))
 app.use('/api/image', require('./routes/imageRouter'))
+app.use('/api/search', require('./routes/searchRouter'))
 
 const debug = require('debug')('social_network:server')
 const http = require('http')
 
-const port = normalizePort(process.env.PORT || '3000')
+const port = normalizePort(config.port)
 app.set('port', port)
 
 const server = http.createServer(app)
@@ -41,7 +41,7 @@ server.listen(port, () => console.log(`Server started: http://localhost:${proces
 server.on('error', onError)
 server.on('listening', onListening)
 
-function normalizePort(val) {
+function normalizePort(val: string) {
     const port = parseInt(val, 10)
 
     if (isNaN(port)) {
@@ -53,7 +53,7 @@ function normalizePort(val) {
     return false;
 }
 
-function onError(error) {
+function onError(error: NodeJS.ErrnoException) {
     if (error.syscall !== 'listen') {
         throw error
     }

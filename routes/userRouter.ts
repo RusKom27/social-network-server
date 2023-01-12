@@ -12,7 +12,6 @@ router.get('/:login', async (req: Request, res: Response, next: NextFunction) =>
     } catch (err: any) {
         res.status(404).json({message: err.message})
     }
-    next()
 })
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
@@ -23,7 +22,6 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     } catch (err: any) {
         res.status(404).json({message: err.message})
     }
-    next()
 })
 
 router.post('/update', async (req: Request, res: Response, next: NextFunction) => {
@@ -32,7 +30,6 @@ router.post('/update', async (req: Request, res: Response, next: NextFunction) =
             res.status(404).send({message: reason.message})
         })
     res.json(user)
-    next()
 })
 
 router.put('/subscribe/:user_login', async (req: Request, res: Response, next: NextFunction) => {
@@ -43,13 +40,8 @@ router.put('/subscribe/:user_login', async (req: Request, res: Response, next: N
         if (!user) return res.status(404).send({message: "User not found"})
         if (user.subscribers.indexOf(current_user._id) < 0) {
             user.subscribers.push(current_user._id)
-            await user.save()
-            res.status(200).json({
-                ...user,
-                subscribers: [
-                    ...user.subscribers,
-                    current_user._id]
-            })
+            const saved_user = await user.save()
+            res.status(200).json(saved_user)
         } else {
             user.subscribers = user.subscribers.filter((user_id) => !user_id.equals(current_user._id))
             await user.save()
@@ -58,7 +50,6 @@ router.put('/subscribe/:user_login', async (req: Request, res: Response, next: N
     } catch (err: any) {
         res.status(404).json({message: err.message})
     }
-    next()
 })
 
 export default router

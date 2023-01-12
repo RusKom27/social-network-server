@@ -4,12 +4,13 @@ import express from "express";
 import User from "../models/User";
 import Message from "../models/Message";
 import Dialog from "../models/Dialog";
+import {getDialogs, getDialog, getMessage} from "../helpers/database"
 
 const router = express.Router()
-const {getDialogs, getDialog, getMessage} = require("../helpers/database");
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
+        if (!req.headers.authorization) return res.status(404).send({message: "Token not found"})
         const user = await User.findById(req.headers.authorization).exec()
         if (!user) return res.status(404).send({message: "User not found"})
         const dialogs = await getDialogs([req.headers.authorization])

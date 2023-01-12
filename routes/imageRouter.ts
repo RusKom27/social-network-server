@@ -41,9 +41,16 @@ router.post('/upload', upload.single('image'), async (req: Request, res: Respons
 
 router.get('/:filename', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const image = await Image.findOne({name: req.params.filename}).exec()
+        const image = await Image.findOne({name: req.params.filename}).lean().exec()
         if (!image) return res.status(404).send({message: "Image not found"})
-        res.send(image);
+        const base64Buffer = btoa(
+                new Uint8Array(image.image.buffer)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            )
+        res.send({
+            ...image,
+            image: base64Buffer
+        })
     } catch (err: any) {
         res.status(500).json({message: err.message})
     }

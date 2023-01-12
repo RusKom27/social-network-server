@@ -1,6 +1,6 @@
 import "dotenv/config"
 
-const MONGO_URL = process.env.MONGO_URL || ""
+const MONGO_URL = process.env.LOCAL_MONGO_URL || ""
 const SERVER_PORT = process.env.SERVER_PORT || '3000'
 
 const config = {

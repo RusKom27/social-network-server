@@ -3,8 +3,7 @@ import AblyChannels from "../packages/ably";
 import express from "express";
 import Post from "../models/Post";
 import User from "../models/User";
-
-const {getTagsFromText, deletePunctuationMarks} = require("../helpers/misc");
+import {getTagsFromText, deletePunctuationMarks} from "../helpers/misc"
 
 const router = express.Router()
 
@@ -75,7 +74,7 @@ router.get('/:user_login', async (req: Request, res: Response, next: NextFunctio
     try {
         const user = await User.findOne({login: req.params.user_login}).exec()
         if (!user) return res.status(404).send({message: "User not found"})
-        const posts = await Post.find({author_id: user._id}).exec()
+        const posts = await Post.find({author_id: user._id}).lean().exec()
         let result = []
         for (let i = 0; i < posts.length; i++) {
             result.push({
@@ -83,7 +82,7 @@ router.get('/:user_login', async (req: Request, res: Response, next: NextFunctio
                 user: user
             })
         }
-        return res.send(result)
+        res.send(result)
     } catch (err: any) {
         res.status(500).json({message: err.message})
     }

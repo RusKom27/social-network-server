@@ -14,6 +14,7 @@ const corsOptions = {
 
 const app = express()
 
+mongoose.set('strictQuery', false)
 mongoose.connect(config.mongo_url).then(r => console.log('Connected to database...'))
 mongoose.connection.on('error', (error: mongoose.Error) => console.error(error))
 

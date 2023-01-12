@@ -10,7 +10,7 @@ const router = express.Router()
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const posts = await Post.find(req.headers.authorization ? {author_id: req.headers.authorization} : {}).exec()
+        const posts = await Post.find(req.headers.authorization ? {author_id: req.headers.authorization} : {}).lean().exec()
         const result = []
         for (let i = 0; i < posts.length; i++) {
             const user = await User.findById(posts[i].author_id).exec()
@@ -22,7 +22,6 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     } catch (err: any) {
         res.status(500).json({message: err.message})
     }
-    next()
 })
 
 router.get('/popular_tags', async (req: Request, res: Response, next: NextFunction) => {
@@ -42,12 +41,10 @@ router.get('/popular_tags', async (req: Request, res: Response, next: NextFuncti
             .map(tag => ({[tag[0]]: tag[1]}))
             .reverse()
             .slice(0,10)
-
         res.status(200).send(result)
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
-    next()
 })
 
 router.get('/actual_topics', async (req: Request, res: Response, next: NextFunction) => {
@@ -72,7 +69,6 @@ router.get('/actual_topics', async (req: Request, res: Response, next: NextFunct
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
-    next()
 })
 
 router.get('/:user_login', async (req: Request, res: Response, next: NextFunction) => {
@@ -87,12 +83,10 @@ router.get('/:user_login', async (req: Request, res: Response, next: NextFunctio
                 user: user
             })
         }
-        res.send(result)
-
+        return res.send(result)
     } catch (err: any) {
         res.status(500).json({message: err.message})
     }
-    next()
 })
 
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
@@ -114,7 +108,6 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
-    next()
 })
 
 router.put('/check/:id', async (req: Request, res: Response, next: NextFunction) => {
@@ -135,7 +128,6 @@ router.put('/check/:id', async (req: Request, res: Response, next: NextFunction)
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
-    next()
 })
 
 router.put('/like/:id', async (req: Request, res: Response, next: NextFunction) => {
@@ -154,7 +146,6 @@ router.put('/like/:id', async (req: Request, res: Response, next: NextFunction) 
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
-    next()
 })
 
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
@@ -170,7 +161,6 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
-    next()
 })
 
 export default router

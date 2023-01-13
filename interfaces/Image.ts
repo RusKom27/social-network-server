@@ -4,7 +4,7 @@ export default interface IImage extends Document {
     _id: Types.ObjectId
     name: string
     image: Types.Buffer
-    content_type: string
+    contentType: string
 }
 
 // {

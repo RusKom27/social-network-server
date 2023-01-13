@@ -3,19 +3,15 @@ import {Types} from "mongoose";
 import express from "express";
 import multer from "multer";
 import {ImageController} from "../controllers";
+import {checkFile} from "../helpers/validation";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage })
 const router = express.Router()
 
-const getFile = (req: Request) => {
-    if (!req.file) throw Error("File not found")
-    else return req.file
-}
-
 router.post('/upload', upload.single('image'), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const file = getFile(req)
+        const file = checkFile(req.file)
         let image = await ImageController.createImage(file.originalname, new Types.Buffer(file.buffer), file.mimetype)
         res.status(200).send({
             ...image,

@@ -4,29 +4,29 @@ import express from "express";
 import Post from "../models/Post";
 import User from "../models/User";
 import {getTagsFromText, deletePunctuationMarks} from "../helpers/misc"
+import {PostController, UserController} from "../controllers";
+import {checkToken} from "../helpers/validation";
 
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const posts = await Post.find(req.headers.authorization ? {author_id: req.headers.authorization} : {}).lean().exec()
+        const posts = await PostController.getPosts()
         const result = []
         for (let i = 0; i < posts.length; i++) {
-            const user = await User.findById(posts[i].author_id).exec()
-            if (!user) return res.status(404).send({message:"User not found"})
+            const user = await UserController.getUserById(posts[i].author_id)
             result.push({...posts[i], user})
         }
         res.json(result)
-
     } catch (err: any) {
-        res.status(500).json({message: err.message})
+        res.status(404).json({message: err.message})
     }
 })
 
 router.get('/popular_tags', async (req: Request, res: Response, next: NextFunction) => {
     try {
         let tags: any = {}
-        const posts = await Post.find().exec()
+        const posts = await PostController.getPosts()
         for (const post of posts) {
             for (const tag of post.tags) {
                 tags[tag] = tags[tag] ? tags[tag] + 1 : 1
@@ -42,14 +42,14 @@ router.get('/popular_tags', async (req: Request, res: Response, next: NextFuncti
             .slice(0,10)
         res.status(200).send(result)
     } catch (err: any) {
-        res.status(400).json({message: err.message})
+        res.status(404).json({message: err.message})
     }
 })
 
 router.get('/actual_topics', async (req: Request, res: Response, next: NextFunction) => {
     try {
         let topics: any = {}
-        const posts = await Post.find().exec()
+        const posts = await PostController.getPosts()
         for (const post of posts) {
             for (const word of post.text.split(" ")) {
                 const topic = deletePunctuationMarks(word)
@@ -66,15 +66,14 @@ router.get('/actual_topics', async (req: Request, res: Response, next: NextFunct
             .slice(0,10)
         res.status(200).send(result)
     } catch (err: any) {
-        res.status(400).json({message: err.message})
+        res.status(404).json({message: err.message})
     }
 })
 
 router.get('/:user_login', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findOne({login: req.params.user_login}).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        const posts = await Post.find({author_id: user._id}).lean().exec()
+        const user = await UserController.getUserByFilter({login: req.params.user_login})
+        const posts = await PostController.getPostsByAuthorId(user._id)
         let result = []
         for (let i = 0; i < posts.length; i++) {
             result.push({
@@ -84,25 +83,17 @@ router.get('/:user_login', async (req: Request, res: Response, next: NextFunctio
         }
         res.send(result)
     } catch (err: any) {
-        res.status(500).json({message: err.message})
+        res.status(404).json({message: err.message})
     }
 })
 
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById(req.headers.authorization).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-
-        let post = new Post({
-            author_id: user._id,
-            text: req.body.text,
-            image: req.body.image,
-            tags: getTagsFromText(req.body.text)
-        })
-        let newPost: any = await post.save()
-        newPost = {...newPost._doc, user }
-        AblyChannels.posts_channel.publish("new_post", newPost);
-        res.status(201).json(newPost)
+        const token = checkToken(req.headers.authorization);
+        const user = await UserController.getUserById(token)
+        const post = await PostController.createPost(user._id, req.body.text, req.body.image, getTagsFromText(req.body.text))
+        AblyChannels.posts_channel.publish("new_post", {...post.toObject(), user });
+        res.status(201).json({...post.toObject(), user })
 
     } catch (err: any) {
         res.status(400).json({message: err.message})
@@ -111,13 +102,15 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 
 router.put('/check/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const post = await Post.findById(req.params.id).exec()
-        if (!post) return res.status(404).send({message: "Post not found"})
-        const user = await User.findById(req.headers.authorization).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        if (!post.views.includes(user._id)) post.views.push(user._id)
-        await post.save()
-        const author_user = await User.findById(post.author_id).then(user => user)
+        const token = checkToken(req.headers.authorization);
+        let post = await PostController.getPostById(req.params.id)
+        const user = await UserController.getUserById(token)
+        let views = post.views
+        if (!post.views.includes(user._id)) {
+            views.push(user._id)
+            post = await PostController.getPostByIdAndUpdate(post._id, {views})
+        }
+        const author_user = await UserController.getUserById(post.author_id)
         AblyChannels.posts_channel.publish(
             "check_post",
             {...post, user: author_user }
@@ -131,17 +124,19 @@ router.put('/check/:id', async (req: Request, res: Response, next: NextFunction)
 
 router.put('/like/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await Post.findById(req.params.id).then(async (post: any) => {
-            const user = await User.findById(req.headers.authorization).lean().then((user: Document | any) => user)
-            const user_index = post.likes.indexOf(user._id)
-            if (user_index > -1) post.likes.splice(user_index, 1)
-            else post.likes.push(user._id)
+        const token = checkToken(req.headers.authorization);
+        let post = await PostController.getPostById(req.params.id)
+        const user = await UserController.getUserById(token)
+        const user_index = post.likes.map(id => id.toString()).indexOf(user._id.toString())
 
-            const author_user = await User.findById(post.author_id).then(user => user)
-            await post.save()
-            AblyChannels.posts_channel.publish("post_like", {...post._doc, user: author_user});
-            res.status(201).json({...post._doc, user: author_user})
-        })
+        let likes = [...post.likes]
+        if (user_index > -1) likes.splice(user_index, 1)
+        else likes.push(user._id)
+        post = await PostController.getPostByIdAndUpdate(post._id, {likes})
+
+        const author_user = await UserController.getUserById(post.author_id)
+        AblyChannels.posts_channel.publish("post_like", {...post, user: author_user});
+        res.status(201).json({...post, user: author_user})
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
@@ -149,17 +144,19 @@ router.put('/like/:id', async (req: Request, res: Response, next: NextFunction) 
 
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await Post.findOne({_id: req.params.id}).then(async (post: Document | any) => {
-            await User.findById(req.headers.authorization).then((user: Document | any) => {
-                if (post.author_id.toString() === user._id.toString()) post.delete()
-            })
-
+        const token = checkToken(req.headers.authorization);
+        const current_user = await UserController.getUserById(token)
+        let post = await PostController.getPostById(req.params.id)
+        if (post.author_id.toString() === current_user._id.toString()) {
+            post = await PostController.getPostByIdAndDelete(post._id)
             AblyChannels.posts_channel.publish("delete_post", post);
             res.json(post)
-        })
+        } else {
+            res.status(404).send({message: "You not author of this post"})
+        }
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
 })
 
-export default router
+export default router //165

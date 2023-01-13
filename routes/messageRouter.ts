@@ -1,93 +1,102 @@
 import {Request, Response, NextFunction} from "express";
 import AblyChannels from "../packages/ably";
 import express from "express";
-import User from "../models/User";
-import Message from "../models/Message";
-import Dialog from "../models/Dialog";
-import {getDialogs, getDialog, getMessage} from "../helpers/database"
+import {checkToken} from "../helpers/validation";
+import {DialogController, MessageController, UserController} from "../controllers";
 
-const router = express.Router()
+const router = express.Router();
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (!req.headers.authorization) return res.status(404).send({message: "Token not found"})
-        const user = await User.findById(req.headers.authorization).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        const dialogs = await getDialogs([req.headers.authorization])
-        res.status(200).send(dialogs)
+        const token = checkToken(req.headers.authorization);
+        const user = await UserController.getUserById(token);
+        const dialogs = await DialogController.getDialogsByMembersId([user._id]);
+        let result = [];
+        for (const dialog of dialogs) {
+            const messages = await MessageController.getMessagesByDialogId(dialog._id);
+            let messages_with_users = [];
+            for (const message of messages) {
+                const user = await UserController.getUserById(message.sender_id)
+                messages_with_users.push({
+                    ...message,
+                    sender: user
+                })
+            }
+            const members = await UserController.getUsersById(dialog.members_id);
+            result.push({
+                ...dialog,
+                messages: messages_with_users,
+                members
+            });
+        }
+        res.status(200).send(result);
     } catch (err: any) {
-        res.status(400).json({message: err.message})
+        res.status(400).json({message: err.message});
     }
-    next()
+    next();
 })
 
 router.put('/check/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        let message = await Message.findById(req.params.id).exec()
-        if (!message) return res.status(404).send({message:"Message not found"})
-        message.checked = true
-        await message.save()
+        const message = await MessageController.getMessageByIdAndUpdate(req.params.id, {checked: true});
+        const sender = await UserController.getUserById(message.sender_id);
         AblyChannels.messages_channel
             .publish(
                 "check_message",
-                await getMessage(message._id)
+                {...message, sender}
             );
-        res.status(200).json(message)
+        res.status(200).send({...message, sender});
     } catch (err: any) {
-        res.status(400).json({message: err.message})
+        res.status(404).send({message: err.message});
     }
-    next()
+    next();
 })
 
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById(req.headers.authorization).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        const dialog = await Dialog.findById(req.body.dialog_id).exec()
-        if (!dialog) return res.status(404).send({message: "Dialog not found"})
-        const message = new Message({
-            sender_id: user._id,
-            dialog_id: dialog._id,
-            text: req.body.text,
-            image: req.body.image,
-        })
-        let newMessage = await message.save()
+        const token = checkToken(req.headers.authorization);
+        const user = await UserController.getUserById(token);
+        const dialog = await DialogController.getDialogById(req.body.dialog_id);
+        const message = await MessageController.createMessage(user._id, dialog._id, req.body.text, req.body.image);
         AblyChannels.messages_channel
             .publish(
                 "new_message",
-                await getMessage(newMessage._id)
+                {...message.toObject(), sender: user}
             );
-        res.status(201).json({
-            ...newMessage,
-            sender: user
-        })
+        res.status(201).json({...message.toObject(), sender: user});
 
     } catch (err: any) {
-        res.status(400).json({message: err.message})
+        res.status(400).json({message: err.message});
     }
-    next()
+    next();
 })
 
 router.post('/create_dialog', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById(req.headers.authorization).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        const dialog = await Dialog.findOne({members_id: { "$all": [user._id, ...req.body.members_id]}})
-        if (dialog) return res.json(dialog)
-        let members_id = [user._id]
-        for (let member_id of req.body.members_id) {
-            const member = await User.findById(member_id).exec()
-            if (!member) return res.status(404).send({message: "Member not found"})
-            members_id.push(member._id)
+        const token = checkToken(req.headers.authorization);
+        const user = await UserController.getUserById(token);
+        const dialog = await DialogController.createDialog([user._id, ...req.body.members_id]);
+        const messages = await MessageController.getMessagesByDialogId(dialog._id);
+        let messages_with_users = [];
+        for (const message of messages) {
+            const user = await UserController.getUserById(message.sender_id)
+            messages_with_users.push({
+                ...message,
+                sender: user
+            })
         }
-        let newDialog = new Dialog({members_id})
-        await newDialog.save()
-        AblyChannels.messages_channel.publish("new_dialog", await getDialog(newDialog._id));
-        res.json(newDialog)
+        const members = await UserController.getUsersById(dialog.members_id);
+        const result = {
+            ...dialog,
+            messages: messages_with_users,
+            members
+        };
+        AblyChannels.messages_channel.publish("new_dialog", result);
+        res.status(200).send(result);
+
     } catch (err: any) {
-        res.status(400).json({message: err.message})
+        res.status(404).json({message: err.message});
     }
-    next()
 })
 
 export default router

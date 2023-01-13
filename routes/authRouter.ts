@@ -1,19 +1,18 @@
 import {NextFunction, Request, Response} from "express";
 import express from "express";
-import User from "../models/User";
+import {UserController} from "../controllers";
 
 const router = express.Router()
 
 router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
-    const user = new User({
-        name: req.body.name,
-        login: req.body.login,
-        email: req.body.email,
-        password: req.body.password,
-    })
     try {
-        const newUser = await user.save()
-        res.status(201).json(newUser)
+        const user = await UserController.createUser(
+            req.body.name,
+            req.body.login,
+            req.body.email,
+            req.body.password,
+        )
+        res.status(201).json(user)
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
@@ -21,9 +20,11 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
 
 router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findOne({email: req.body.email, password: req.body.password}).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        res.json(user)
+        const user = await UserController.getUserByFilter({
+            email: req.body.email,
+            password: req.body.password}
+        )
+        res.status(200).send(user)
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }

@@ -22,7 +22,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
                     results.topics.push(topic)
             }
         }
-        const users = await User.find().exec()
+        const users = await User.find().sort("subscribers").exec()
         for (const user of users) {
             if (user.name.includes(user_input)) results.users.push(user)
             else if (user.login.includes(user_input)) results.users.push(user)

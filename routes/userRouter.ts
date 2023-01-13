@@ -1,14 +1,16 @@
 import {Request, Response, NextFunction} from "express";
 import express from "express";
 import User from "../models/User";
+import {UserController} from "../controllers";
+import {checkToken} from "../helpers/validation";
+import {addChannel} from "../packages/ably";
 
 const router = express.Router()
 
 router.get('/:login', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findOne({login: req.params.login}).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        if (user) res.status(200).send(user)
+        const user = await UserController.getUserByFilter({login: req.params.login})
+        res.status(200).send(user)
     } catch (err: any) {
         res.status(404).json({message: err.message})
     }
@@ -16,36 +18,43 @@ router.get('/:login', async (req: Request, res: Response, next: NextFunction) =>
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById(req.headers.authorization).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        res.send(user)
+
+        const token = checkToken(req.headers.authorization);
+        const user = await UserController.getUserById(token)
+        addChannel(user._id.toString())
+        res.status(202).send(user)
     } catch (err: any) {
         res.status(404).json({message: err.message})
     }
 })
 
 router.post('/update', async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findByIdAndUpdate(req.headers.authorization, req.body).exec()
-        .catch(reason => {
-            res.status(404).send({message: reason.message})
-        })
-    res.json(user)
+    try {
+        const token = checkToken(req.headers.authorization);
+        const user = await UserController.getUserByIdAndUpdate(token, req.body)
+        res.json(user)
+    } catch (err: any) {
+        res.status(404).json({message: err.message})
+    }
 })
 
 router.put('/subscribe/:user_login', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const current_user = await User.findById(req.headers.authorization).exec()
-        if (!current_user) return res.status(404).send({message: "User not found"})
-        const user = await User.findOne({login: req.params.user_login}).exec()
-        if (!user) return res.status(404).send({message: "User not found"})
-        if (user.subscribers.indexOf(current_user._id) < 0) {
-            user.subscribers.push(current_user._id)
-            const saved_user = await user.save()
-            res.status(200).json(saved_user)
+        const token = checkToken(req.headers.authorization);
+        const current_user = await UserController.getUserById(token)
+        const user = await UserController.getUserByFilter({login: req.params.user_login})
+        if (user.subscribers.map(subscriber => subscriber.toString()).indexOf(current_user._id.toString()) < 0) {
+            const changed_user = await UserController.getUserByIdAndUpdate(
+                user._id,
+                {subscribers: [...user.subscribers, current_user._id]}
+            )
+            res.status(200).json(changed_user)
         } else {
-            user.subscribers = user.subscribers.filter((user_id) => !user_id.equals(current_user._id))
-            await user.save()
-            res.json(user)
+            const changed_user = await UserController.getUserByIdAndUpdate(
+                user._id,
+                {subscribers: user.subscribers.filter((user_id) => !user_id.equals(current_user._id))}
+            )
+            res.status(200).json(changed_user)
         }
     } catch (err: any) {
         res.status(404).json({message: err.message})

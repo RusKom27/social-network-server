@@ -1,8 +1,6 @@
 import {Request, Response, NextFunction} from "express";
-import AblyChannels from "../packages/ably";
+import AblyChannels, {sendMessage} from "../packages/ably";
 import express from "express";
-import Post from "../models/Post";
-import User from "../models/User";
 import {getTagsFromText, deletePunctuationMarks} from "../helpers/misc"
 import {PostController, UserController} from "../controllers";
 import {checkToken} from "../helpers/validation";
@@ -106,7 +104,7 @@ router.put('/check/:id', async (req: Request, res: Response, next: NextFunction)
         let post = await PostController.getPostById(req.params.id)
         const user = await UserController.getUserById(token)
         let views = post.views
-        if (!post.views.includes(user._id)) {
+        if (!post.views.map(id => id.toString()).includes(user._id.toString())) {
             views.push(user._id)
             post = await PostController.getPostByIdAndUpdate(post._id, {views})
         }
@@ -136,6 +134,13 @@ router.put('/like/:id', async (req: Request, res: Response, next: NextFunction) 
 
         const author_user = await UserController.getUserById(post.author_id)
         AblyChannels.posts_channel.publish("post_like", {...post, user: author_user});
+
+        sendMessage(
+            "post_like",
+            {...post, user: author_user},
+            [author_user._id.toString()]
+        )
+
         res.status(201).json({...post, user: author_user})
     } catch (err: any) {
         res.status(400).json({message: err.message})

@@ -91,8 +91,12 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         const user = await UserController.getUserById(token)
         const post = await PostController.createPost(user._id, req.body.text, req.body.image, getTagsFromText(req.body.text))
         AblyChannels.posts_channel.publish("new_post", {...post.toObject(), user });
+        sendMessage(
+            "new_post",
+            {...post.toObject(), user },
+            user.subscribers
+        )
         res.status(201).json({...post.toObject(), user })
-
     } catch (err: any) {
         res.status(400).json({message: err.message})
     }
@@ -109,10 +113,6 @@ router.put('/check/:id', async (req: Request, res: Response, next: NextFunction)
             post = await PostController.getPostByIdAndUpdate(post._id, {views})
         }
         const author_user = await UserController.getUserById(post.author_id)
-        AblyChannels.posts_channel.publish(
-            "check_post",
-            {...post, user: author_user }
-        );
         res.status(200).json({...post, user: author_user })
 
     } catch (err: any) {
@@ -138,7 +138,7 @@ router.put('/like/:id', async (req: Request, res: Response, next: NextFunction) 
         sendMessage(
             "post_like",
             {...post, user: author_user},
-            [author_user._id.toString()]
+            [author_user._id]
         )
 
         res.status(201).json({...post, user: author_user})
@@ -154,7 +154,6 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
         let post = await PostController.getPostById(req.params.id)
         if (post.author_id.toString() === current_user._id.toString()) {
             post = await PostController.getPostByIdAndDelete(post._id)
-            AblyChannels.posts_channel.publish("delete_post", post);
             res.json(post)
         } else {
             res.status(404).send({message: "You not author of this post"})

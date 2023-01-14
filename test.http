@@ -21,7 +21,12 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/api/post/popular_words
+GET http://localhost:3000/api/post/popular_tags
+authorization: 63a15a6e5b1d3686284d2365
+
+###
+
+GET http://localhost:3000/api/post/actual_topics
 authorization: 63a15a6e5b1d3686284d2365
 
 ###

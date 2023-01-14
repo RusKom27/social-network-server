@@ -1,4 +1,5 @@
 import Ably from "ably/callbacks";
+import {Types} from "mongoose";
 
 const realtime = new Ably.Realtime(process.env.ABLY_API_KEY || "");
 
@@ -8,10 +9,10 @@ let AblyChannels: any = {
     posts_channel: realtime.channels.get('posts')
 }
 
-export const sendMessage = (message_name: string, data: any, receivers: string[]) => {
+export const sendMessage = (message_name: string, data: any, receivers: Types.ObjectId[] | string[]) => {
     for (const receiver of receivers) {
-        if (!AblyChannels.hasOwnProperty(receiver)) continue
-        AblyChannels[receiver].publish(
+        if (!AblyChannels.hasOwnProperty(receiver.toString())) continue
+        AblyChannels[receiver.toString()].publish(
             message_name,
             data
         );

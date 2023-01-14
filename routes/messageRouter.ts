@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from "express";
-import AblyChannels from "../packages/ably";
+import AblyChannels, {sendMessage} from "../packages/ably";
 import express from "express";
 import {checkToken} from "../helpers/validation";
 import {DialogController, MessageController, UserController} from "../controllers";
@@ -39,12 +39,13 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 router.put('/check/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const message = await MessageController.getMessageByIdAndUpdate(req.params.id, {checked: true});
+        const dialog = await DialogController.getDialogById(message.dialog_id);
         const sender = await UserController.getUserById(message.sender_id);
-        AblyChannels.messages_channel
-            .publish(
-                "check_message",
-                {...message, sender}
-            );
+        sendMessage(
+            "check_message",
+            {...message, sender},
+            dialog.members_id
+        )
         res.status(200).send({...message, sender});
     } catch (err: any) {
         res.status(404).send({message: err.message});
@@ -58,11 +59,11 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         const user = await UserController.getUserById(token);
         const dialog = await DialogController.getDialogById(req.body.dialog_id);
         const message = await MessageController.createMessage(user._id, dialog._id, req.body.text, req.body.image);
-        AblyChannels.messages_channel
-            .publish(
-                "new_message",
-                {...message.toObject(), sender: user}
-            );
+        sendMessage(
+            "new_message",
+            {...message.toObject(), sender: user},
+            dialog.members_id.filter(id => id.toString() !== user._id.toString())
+        )
         res.status(201).json({...message.toObject(), sender: user});
 
     } catch (err: any) {
@@ -91,7 +92,11 @@ router.post('/create_dialog', async (req: Request, res: Response, next: NextFunc
             messages: messages_with_users,
             members
         };
-        AblyChannels.messages_channel.publish("new_dialog", result);
+        sendMessage(
+            "new_dialog",
+            result,
+            req.body.members_id
+        )
         res.status(200).send(result);
 
     } catch (err: any) {

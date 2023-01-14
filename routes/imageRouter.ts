@@ -23,6 +23,17 @@ router.post('/upload', upload.single('image'), async (req: Request, res: Respons
     }
 });
 
+router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const images = await ImageController.getImages()
+        res.status(200).send({
+            images
+        })
+    } catch (err: any) {
+        res.status(404).send({message: err.message})
+    }
+});
+
 router.get('/:filename', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const image = await ImageController.getImage(req.params.filename)

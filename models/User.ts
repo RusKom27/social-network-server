@@ -35,11 +35,11 @@ const UserSchema: Schema = new Schema({
         profile_image: {
             big: {
                 type: String,
-                default: "default_big_profile_image.jpg",
+                default: "default_big_profile_image.png",
             },
             small: {
                 type: String,
-                default: "default_small_profile_image.jpg",
+                default: "default_small_profile_image.png",
             }
         },
     },

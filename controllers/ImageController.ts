@@ -8,6 +8,10 @@ export default {
         else return image
     },
 
+    getImages: async () => {
+        return await Image.find().lean().exec()
+    },
+
     convertBufferToBase64: (buffer: ArrayBufferLike) => {
         return btoa(new Uint8Array(buffer)
             .reduce((data, byte) => data + String.fromCharCode(byte), '')

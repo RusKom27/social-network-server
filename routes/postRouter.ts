@@ -90,7 +90,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         const token = checkToken(req.headers.authorization);
         const user = await UserController.getUserById(token)
         const post = await PostController.createPost(user._id, req.body.text, req.body.image, getTagsFromText(req.body.text))
-        AblyChannels.posts_channel.publish("new_post", {...post.toObject(), user });
+        // AblyChannels.posts_channel.publish("new_post", {...post.toObject(), user });
         sendMessage(
             "new_post",
             {...post.toObject(), user },
@@ -133,7 +133,7 @@ router.put('/like/:id', async (req: Request, res: Response, next: NextFunction) 
         post = await PostController.getPostByIdAndUpdate(post._id, {likes})
 
         const author_user = await UserController.getUserById(post.author_id)
-        AblyChannels.posts_channel.publish("post_like", {...post, user: author_user});
+        // AblyChannels.posts_channel.publish("post_like", {...post, user: author_user});
 
         sendMessage(
             "post_like",

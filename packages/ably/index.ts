@@ -19,14 +19,14 @@ export const sendMessage = (message_name: string, data: any, receivers: Types.Ob
     }
 }
 
-export const addChannel = (user_id: string) => {
-    AblyChannels[user_id] = realtime.channels.get(user_id)
-    console.log(realtime.channels)
+export const addChannel = (user_id: Types.ObjectId | string) => {
+    AblyChannels[user_id.toString()] = realtime.channels.get(user_id.toString())
+    console.log(Object.keys(AblyChannels))
 }
 
-export const removeChannel = (user_id: string) => {
-    if (AblyChannels.hasOwnProperty(user_id)) delete AblyChannels[user_id]
-    console.log(realtime.channels)
+export const removeChannel = (user_id: Types.ObjectId | string) => {
+    if (AblyChannels.hasOwnProperty(user_id.toString())) delete AblyChannels[user_id.toString()]
+    console.log(Object.keys(AblyChannels))
 }
 
 export default AblyChannels

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            font-family: Calibri,serif;
+        }
+
+        #images_container {
+            display: flex;
+            margin: auto;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .image_card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: beige;
+            border: solid 1px rgb(129, 92, 92, 0.2);
+            min-height: 200px;
+            margin: 10px;
+        }
+
+        .image_card > img {
+            margin-bottom: 20px;
+        }
+
+        .image_card > div {
+            padding: 4px;
+            width: 100%;
+            position: absolute;
+            background-color: beige;
+            border-top: solid 1px rgb(129, 92, 92, 0.2);
+            bottom: 0;
+        }
+
+        img {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Images</h1>
+    <a href="index.html">Home</a>
+    <div id="images_container">
+    </div>
+    </body>
+    <script async type="module" src="index.js"></script>
+</html>

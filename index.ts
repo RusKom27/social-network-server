@@ -1,7 +1,7 @@
 import config from "./config/config"
 import mongoose from "mongoose"
 import bodyParser from 'body-parser'
-import express from 'express'
+import express, {NextFunction, Request, Response} from 'express'
 
 import {authRouter, userRouter, searchRouter, imageRouter, postRouter, messageRouter} from "./routes"
 

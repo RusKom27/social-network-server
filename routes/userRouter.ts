@@ -7,15 +7,6 @@ import {addChannel, removeChannel, sendMessage} from "../packages/ably";
 
 const router = express.Router()
 
-router.get('/:login', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = await UserController.getUserByFilter({login: req.params.login})
-        res.status(200).send(user)
-    } catch (err: any) {
-        res.status(404).json({message: err.message})
-    }
-})
-
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = checkToken(req.headers.authorization);
@@ -24,6 +15,51 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
         res.status(202).send(user)
     } catch (err: any) {
         res.status(404).json({message: err.message})
+    }
+})
+
+router.get('/login/:login', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await UserController.getUserByFilter({login: req.params.login})
+        res.status(200).send(user)
+    } catch (err: any) {
+        res.status(404).json({message: err.message})
+    }
+})
+
+router.get('/id/:id', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await UserController.getUserById(req.params.id)
+        res.status(200).send(user)
+    } catch (err: any) {
+        res.status(404).json({message: err.message})
+    }
+})
+
+
+router.post('/create', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await UserController.createUser(
+            req.body.name,
+            req.body.login,
+            req.body.email,
+            req.body.password,
+        )
+        res.status(201).json(user)
+    } catch (err: any) {
+        res.status(400).json({message: err.message})
+    }
+})
+
+router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await UserController.getUserByFilter({
+            email: req.body.email,
+            password: req.body.password}
+        )
+        res.status(200).send(user)
+    } catch (err: any) {
+        res.status(400).json({message: err.message})
     }
 })
 

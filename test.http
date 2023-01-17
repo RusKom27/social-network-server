@@ -87,7 +87,7 @@ authorization: 638cb3e62fcb67b4aa2bfdd0
 
 ###
 
-GET http://localhost:3000/api/post/
+GET http://localhost:3000/api/post/like/63c175252a762ed39c4aa277
 
 ###
 

@@ -7,7 +7,7 @@ import {checkToken} from "../helpers/validation";
 
 const router = express.Router()
 
-router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/all', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const posts = await PostController.getPosts()
         const result = []
@@ -16,6 +16,32 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
             result.push({...posts[i], user})
         }
         res.json(result)
+    } catch (err: any) {
+        res.status(404).json({message: err.message})
+    }
+})
+
+router.get('/user_login/:user_login', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await UserController.getUserByFilter({login: req.params.user_login})
+        const posts = await PostController.getPostsByAuthorId(user._id)
+        let result = []
+        for (let i = 0; i < posts.length; i++) {
+            result.push({
+                ...posts[i],
+                user: user
+            })
+        }
+        res.send(result)
+    } catch (err: any) {
+        res.status(404).json({message: err.message})
+    }
+})
+
+router.get('/id/:post_id', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const post = await PostController.getPostById(req.params.post_id)
+        res.status(200).send(post)
     } catch (err: any) {
         res.status(404).json({message: err.message})
     }
@@ -68,24 +94,7 @@ router.get('/actual_topics', async (req: Request, res: Response, next: NextFunct
     }
 })
 
-router.get('/:user_login', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = await UserController.getUserByFilter({login: req.params.user_login})
-        const posts = await PostController.getPostsByAuthorId(user._id)
-        let result = []
-        for (let i = 0; i < posts.length; i++) {
-            result.push({
-                ...posts[i],
-                user: user
-            })
-        }
-        res.send(result)
-    } catch (err: any) {
-        res.status(404).json({message: err.message})
-    }
-})
-
-router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/create', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = checkToken(req.headers.authorization);
         const user = await UserController.getUserById(token)
@@ -147,7 +156,7 @@ router.put('/like/:id', async (req: Request, res: Response, next: NextFunction) 
     }
 })
 
-router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+router.delete('/delete/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = checkToken(req.headers.authorization);
         const current_user = await UserController.getUserById(token)

@@ -1,24 +1,18 @@
-import Image from "../models/Image";
+import {Image} from "../models";
 import {Types} from "mongoose";
 
-export default {
-    getImage: async (file_name: string) => {
+class ImageService {
+    async getImage(file_name: string) {
         const image = await Image.findOne({name: file_name}).lean().exec()
         if (!image) throw Error("Image not found")
         else return image
-    },
+    }
 
-    getImages: async () => {
+    async getImages() {
         return await Image.find().lean().exec()
-    },
+    }
 
-    convertBufferToBase64: (buffer: ArrayBufferLike) => {
-        return btoa(new Uint8Array(buffer)
-            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-        )
-    },
-
-    createImage: async (name: string, buffer: Types.Buffer, contentType: string) => {
+    async createImage(name: string, buffer: Types.Buffer, contentType: string) {
         const new_image = {
             name,
             image: buffer,
@@ -32,3 +26,5 @@ export default {
         return await Image.create(new_image)
     }
 }
+
+export default new ImageService()

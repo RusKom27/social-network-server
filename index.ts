@@ -1,7 +1,8 @@
 import config from "./config/config"
 import mongoose from "mongoose"
 import bodyParser from 'body-parser'
-import express, {NextFunction, Request, Response} from 'express'
+import express from 'express'
+import cookieParser from "cookie-parser";
 
 import {authRouter, userRouter, searchRouter, imageRouter, postRouter, messageRouter} from "./routes"
 
@@ -19,6 +20,7 @@ mongoose.connect(config.mongo_url).then(r => console.log('Connected to database.
 mongoose.connection.on('error', (error: mongoose.Error) => console.error(error))
 
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cookieParser())
 app.use(bodyParser.json())
 
 app.use(cors(corsOptions))

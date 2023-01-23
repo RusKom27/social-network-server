@@ -77,6 +77,11 @@ authorization: 6389eb695fdc5cb837575667
 
 ###
 
+GET http://localhost:3000/api/user/id_array?users_id[]=639ec7225edf70d6e3d1057b&users_id[]=638cb3e62fcb67b4aa2bfdd0
+authorization: 6389eb695fdc5cb837575667
+
+###
+
 GET http://localhost:3000/api/message/638dda7a0549a7286372f04e
 authorization: 638cb4f92fcb67b4aa2bfdf4
 

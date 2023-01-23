@@ -12,21 +12,29 @@
   "license": "ISC",
   "dependencies": {
     "ably": "^1.2.34",
+    "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "debug": "^4.3.4",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.8.3",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/body-parser": "^1.19.2",
+    "@types/cookie-parser": "^1.4.3",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.15",
+    "@types/jsonwebtoken": "^9.0.1",
     "@types/mongoose": "^5.11.97",
     "@types/multer": "^1.4.7",
+    "@types/uuid": "^9.0.0",
     "nodemon": "^2.0.20"
   }
 }

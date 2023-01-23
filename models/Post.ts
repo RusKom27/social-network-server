@@ -1,5 +1,5 @@
 import mongoose, {Schema, Types} from "mongoose"
-import IPost from "../interfaces/Post";
+import {IPost} from "../interfaces";
 
 const PostSchema: Schema = new Schema({
     author_id: {

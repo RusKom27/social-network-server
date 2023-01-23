@@ -1,5 +1,5 @@
 import mongoose, {Schema, Types} from "mongoose"
-import IMessage from "../interfaces/Message";
+import {IMessage} from "../interfaces";
 
 const MessageSchema: Schema = new Schema({
     sender_id: {

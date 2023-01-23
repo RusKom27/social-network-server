@@ -1,5 +1,5 @@
 import mongoose, {Schema, SchemaTypes} from "mongoose"
-import IImage from "../interfaces/Image";
+import {IImage} from "../interfaces";
 
 const ImageSchema: Schema = new Schema({
     name: {

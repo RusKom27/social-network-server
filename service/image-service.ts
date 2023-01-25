@@ -1,10 +1,11 @@
 import {Image} from "../models";
 import {Types} from "mongoose";
+import ApiError from "../exeptions/api-error";
 
 class ImageService {
     async getImage(file_name: string) {
         const image = await Image.findOne({name: file_name}).lean().exec()
-        if (!image) throw Error("Image not found")
+        if (!image) throw ApiError.BadRequest("Image not found")
         else return image
     }
 

@@ -4,7 +4,16 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "email1",
+  "email": "user1@gmail.com",
+  "password": "password1"
+}
+
+###
+POST http://localhost:3000/api/auth/logout
+Content-Type: application/json
+
+{
+  "email": "user1@gmail.com",
   "password": "password1"
 }
 
@@ -42,6 +51,11 @@ Content-Type: application/json
 {
   "text": "First user post"
 }
+
+###
+
+GET http://localhost:3000/api/post/all
+Content-Type: application/json
 
 ###
 

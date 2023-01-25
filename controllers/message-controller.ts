@@ -29,7 +29,7 @@ class MessageController {
             }
             return res.status(200).send(result);
         } catch (err: any) {
-            return res.status(400).json({message: err.message});
+            next(err)
         }
     }
 
@@ -45,7 +45,7 @@ class MessageController {
             )
             return res.status(200).send({...message, sender});
         } catch (err: any) {
-            return res.status(404).send({message: err.message});
+            next(err)
         }
     }
 
@@ -62,7 +62,7 @@ class MessageController {
             )
             return res.status(201).json({...message.toObject(), sender: user});
         } catch (err: any) {
-            return res.status(400).json({message: err.message});
+            next(err)
         }
     }
 
@@ -94,7 +94,7 @@ class MessageController {
             return res.status(200).send(result);
 
         } catch (err: any) {
-            return res.status(404).json({message: err.message});
+            next(err)
         }
     }
 }

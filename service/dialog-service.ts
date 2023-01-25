@@ -1,16 +1,17 @@
 import {Dialog} from "../models";
 import {Types} from "mongoose";
+import ApiError from "../exeptions/api-error";
 
 class DialogService {
     async getDialogById (dialog_id: Types.ObjectId | string) {
         const dialog = await Dialog.findById(dialog_id).lean().exec()
-        if (!dialog) throw Error("Dialog not found")
+        if (!dialog) throw ApiError.BadRequest("Dialog not found")
         else return dialog
     }
 
     async getDialogByFilter (filter: any) {
         const dialog = await Dialog.findOne(filter).lean().exec()
-        if (!dialog) throw Error("Dialog not found")
+        if (!dialog) throw ApiError.BadRequest("Dialog not found")
         else return dialog
     }
 

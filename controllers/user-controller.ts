@@ -11,7 +11,7 @@ class UserController {
             addChannel(user._id)
             return res.status(202).send(user)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
 
@@ -20,7 +20,7 @@ class UserController {
             const user = await UserService.getUserByFilter({login: req.params.login})
             return res.status(200).send(user)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
 
@@ -29,7 +29,7 @@ class UserController {
             const user = await UserService.getUserById(req.params.id)
             return res.status(200).send(user)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
 
@@ -39,7 +39,7 @@ class UserController {
             const users = await UserService.getUsersById(req.query.users_id as string[])
             return res.status(200).send(users)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
 
@@ -53,7 +53,7 @@ class UserController {
             )
             return res.status(201).json(user)
         } catch (err: any) {
-            return res.status(400).json({message: err.message})
+            next(err)
         }
     }
 
@@ -65,7 +65,7 @@ class UserController {
             )
             return res.status(200).send(user)
         } catch (err: any) {
-            res.status(400).json({message: err.message})
+            next(err)
         }
     }
 
@@ -73,11 +73,10 @@ class UserController {
         try {
             const token = checkToken(req.headers.authorization);
             const user = await UserService.getUserById(token)
-            console.log(user._id)
             removeChannel(user._id)
             return res.status(202).send(user)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
 
@@ -85,9 +84,9 @@ class UserController {
         try {
             const token = checkToken(req.headers.authorization);
             const user = await UserService.getUserByIdAndUpdate(token, req.body)
-            return res.json(user)
+            return res.status(200).json(user)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
 
@@ -120,7 +119,7 @@ class UserController {
                 return res.status(200).json(changed_user)
             }
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
 }

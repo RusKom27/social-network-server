@@ -15,8 +15,7 @@ class ImageController {
             })
 
         } catch (err: any) {
-            console.log(err.message)
-            return res.status(404).send({message: err.message})
+            next(err)
         }
     }
 
@@ -27,7 +26,7 @@ class ImageController {
                 images
             })
         } catch (err: any) {
-            return res.status(404).send({message: err.message})
+            next(err)
         }
     }
 
@@ -39,7 +38,7 @@ class ImageController {
                 image: convertBufferToBase64(image.image.buffer)
             })
         } catch (err: any) {
-            return res.status(404).send({message: err.message})
+            next(err)
         }
     }
 }

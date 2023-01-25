@@ -3,6 +3,7 @@ import {PostService, UserService} from "../service";
 import {deletePunctuationMarks, getTagsFromText} from "../helpers/misc";
 import {checkToken} from "../helpers/validation";
 import {sendMessage} from "../packages/ably";
+import ApiError from "../exeptions/api-error";
 
 class PostController {
     async getAll (req: Request, res: Response, next: NextFunction) {
@@ -13,9 +14,9 @@ class PostController {
                 const user = await UserService.getUserById(posts[i].author_id)
                 result.push({...posts[i], user})
             }
-            return res.json(posts)
+            return res.status(200).json(posts)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
     async getByUserLogin (req: Request, res: Response, next: NextFunction) {
@@ -29,9 +30,9 @@ class PostController {
                     user: user
                 })
             }
-            return res.send(result)
+            return res.status(200).send(result)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
     async getByPostId (req: Request, res: Response, next: NextFunction) {
@@ -39,7 +40,7 @@ class PostController {
             const post = await PostService.getPostById(req.params.post_id)
             return res.status(200).send(post)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
     async getPopularTags (req: Request, res: Response, next: NextFunction) {
@@ -61,7 +62,7 @@ class PostController {
                 .slice(0,10)
             return res.status(200).send(result)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
     async getActualTopics (req: Request, res: Response, next: NextFunction) {
@@ -84,7 +85,7 @@ class PostController {
                 .slice(0,10)
             return res.status(200).send(result)
         } catch (err: any) {
-            return res.status(404).json({message: err.message})
+            next(err)
         }
     }
     async createPost (req: Request, res: Response, next: NextFunction) {
@@ -99,7 +100,7 @@ class PostController {
             )
             return res.status(201).json({...post.toObject(), user })
         } catch (err: any) {
-            return res.status(400).json({message: err.message})
+            next(err)
         }
     }
     async checkPost (req: Request, res: Response, next: NextFunction) {
@@ -114,9 +115,8 @@ class PostController {
             }
             const author_user = await UserService.getUserById(post.author_id)
             return res.status(200).json({...post, user: author_user })
-
         } catch (err: any) {
-            return res.status(400).json({message: err.message})
+            next(err)
         }
     }
     async likePost (req: Request, res: Response, next: NextFunction) {
@@ -141,7 +141,7 @@ class PostController {
 
             return res.status(201).json({...post, user: author_user})
         } catch (err: any) {
-            return res.status(400).json({message: err.message})
+            next(err)
         }
     }
     async deletePost (req: Request, res: Response, next: NextFunction) {
@@ -153,10 +153,10 @@ class PostController {
                 post = await PostService.getPostByIdAndDelete(post._id)
                 return res.json(post)
             } else {
-                return res.status(404).send({message: "You not author of this post"})
+                next(ApiError.BadRequest("You not author of this post"))
             }
         } catch (err: any) {
-            return res.status(400).json({message: err.message})
+            next(err)
         }
     }
 }

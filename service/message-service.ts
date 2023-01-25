@@ -1,10 +1,11 @@
 import {Types} from "mongoose";
 import {Message} from "../models";
+import ApiError from "../exeptions/api-error";
 
 class MessageService {
     async getMessageById(message_id: Types.ObjectId | string) {
         const message = await Message.findById(message_id).lean().exec()
-        if (!message) throw Error("Message not found")
+        if (!message) throw ApiError.BadRequest("Message not found")
         else return message
     }
 
@@ -17,7 +18,7 @@ class MessageService {
             .findByIdAndUpdate(message_id, updates, {returnDocument: 'after'})
             .lean()
             .exec();
-        if (!message) throw Error("Message not found");
+        if (!message) throw ApiError.BadRequest("Message not found");
         return message;
     }
 
@@ -27,7 +28,7 @@ class MessageService {
         text: string,
         image: string
     ) {
-        if (!text && image) throw Error("Message body is empty")
+        if (!text && image) throw ApiError.BadRequest("Message body is empty")
         const message = new Message({sender_id, dialog_id, text, image});
         return await message.save()
     }

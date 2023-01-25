@@ -28,7 +28,7 @@ class SearchController {
             return res.send(results);
 
         } catch (err: any) {
-            return res.status(500).json({message: err.message})
+            next(err)
         }
     }
 }

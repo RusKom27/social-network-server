@@ -39,13 +39,12 @@ class UserService {
         }
         const hashed_password = await bcrypt.hash(password, 3)
         const user = await User.create({name, login, email, password: hashed_password})
-        const user_DTO = new UserDTO(user)
-        const tokens = TokenService.generateTokens({...user_DTO})
-        await TokenService.saveToken(user_DTO._id, tokens.refresh_token)
+        const tokens = TokenService.generateTokens({user_id: user._id})
+        await TokenService.saveToken(user._id, tokens.refresh_token)
 
         return {
             ...tokens,
-            user
+            user_id: user._id
         }
     }
 
@@ -56,18 +55,16 @@ class UserService {
         if (!await bcrypt.compare(password, user.password))
             throw ApiError.BadRequest("Password is wrong!")
 
-        const user_DTO = new UserDTO(user)
-        const tokens = TokenService.generateTokens({...user_DTO})
-        await TokenService.saveToken(user_DTO._id, tokens.refresh_token)
+        const tokens = TokenService.generateTokens({user_id: user._id})
+        await TokenService.saveToken(user._id, tokens.refresh_token)
 
         return {
             ...tokens,
-            user
+            user_id: user._id
         }
     }
 
     async logout(refresh_token: string) {
-        console.log(refresh_token)
         return await TokenService.removeToken(refresh_token)
     }
 
@@ -76,17 +73,17 @@ class UserService {
             throw ApiError.UnauthorizedError()
         }
         const userData = TokenService.validateRefreshToken(refresh_token)
+        console.log(userData);
         const tokenFromDB = TokenService.findToken(refresh_token)
         if (!userData || !tokenFromDB) throw ApiError.UnauthorizedError()
 
-        const user = await this.getUserById(userData._id)
-        const user_DTO = new UserDTO(user as IUser)
-        const tokens = TokenService.generateTokens({...user_DTO})
-        await TokenService.saveToken(user_DTO._id, tokens.refresh_token)
+        const user = await this.getUserById(userData.user_id)
+        const tokens = TokenService.generateTokens({user_id: user._id})
+        await TokenService.saveToken(user._id, tokens.refresh_token)
 
         return {
             ...tokens,
-            user
+            user_id: user._id
         }
     }
 }

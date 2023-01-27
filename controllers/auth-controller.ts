@@ -11,7 +11,7 @@ class AuthController {
                 req.body.password,
             )
             res.cookie('refresh_token', userData.refresh_token, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
-            return res.status(201).json(userData.user)
+            return res.status(201).json(userData)
         } catch (err: any) {
             next(err)
         }
@@ -22,11 +22,7 @@ class AuthController {
             const {email, password} = req.body
             const userData = await UserService.loginUser(email, password)
             res.cookie('refresh_token', userData.refresh_token, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
-            res.cookie('test_token', "test")
-            console.log(userData.refresh_token)
-            return res
-                .status(201)
-                .send(userData.user)
+            return res.status(201).send(userData)
         } catch (err: any) {
             next(err)
         }
@@ -36,7 +32,8 @@ class AuthController {
         try {
             const {refresh_token} = req.cookies
             const userData = await UserService.refresh(refresh_token)
-            res.cookie('refresh_token', userData.refresh_token, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
+            console.log({userData})
+            res.status(200).send(userData)
         } catch (err: any) {
             next(err)
         }
@@ -45,6 +42,7 @@ class AuthController {
     async logout(req: Request, res: Response, next: NextFunction) {
         try {
             const {refresh_token} = req.cookies
+
             console.log(req.cookies)
             console.log(req.signedCookies)
             const token = await UserService.logout(refresh_token)

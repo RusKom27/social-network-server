@@ -6,7 +6,8 @@ import {CustomRequest} from "../types/express/CustomRequest";
 const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
         const authorization_header = req.headers.authorization
-        if (!authorization_header) return next(ApiError.UnauthorizedError())
+        console.log({authorization_header})
+        if (!authorization_header && typeof authorization_header !== 'string') return next(ApiError.UnauthorizedError())
 
         const access_token = authorization_header.split(" ")[1]
         if (!access_token) return next(ApiError.UnauthorizedError())
@@ -14,7 +15,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction) =
         const userData = tokenService.validateAccessToken(access_token)
         if (!userData) return next(ApiError.UnauthorizedError())
 
-        req.user = userData
+        req.user_id = userData.user_id
 
         next()
     } catch (err: any) {

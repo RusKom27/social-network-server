@@ -8,7 +8,7 @@ import UserDTO from "../data_transfer_objects/user-dto";
 class TokenService {
     generateTokens(payload: any) {
         const {jwt_access_secret, jwt_refresh_secret} = TokenService.#validateSecretKeys()
-        const access_token = jwt.sign(payload, jwt_access_secret, {expiresIn: "30m"})
+        const access_token = jwt.sign(payload, jwt_access_secret, {expiresIn: "3s"})
         const refresh_token = jwt.sign(payload, jwt_refresh_secret, {expiresIn: "30d"})
         return {
             access_token,
@@ -43,7 +43,7 @@ class TokenService {
     validateAccessToken(token: string) {
         try {
             const {jwt_access_secret} = TokenService.#validateSecretKeys()
-            return jwt.verify(token, jwt_access_secret) as UserDTO
+            return jwt.verify(token, jwt_access_secret) as {user_id: string}
         } catch (err: any) {
             return null
         }
@@ -52,7 +52,7 @@ class TokenService {
     validateRefreshToken(token: string) {
         try {
             const {jwt_refresh_secret} = TokenService.#validateSecretKeys()
-            return jwt.verify(token, jwt_refresh_secret) as UserDTO
+            return jwt.verify(token, jwt_refresh_secret) as {user_id: string}
         } catch (err: any) {
             return null
         }

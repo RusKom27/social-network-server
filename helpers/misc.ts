@@ -23,3 +23,7 @@ export const convertBufferToBase64 = (buffer: ArrayBufferLike) => {
         .reduce((data, byte) => data + String.fromCharCode(byte), '')
     )
 }
+
+export const bufferToImageSource = (image_buffer: string, image_type: string) => {
+    return `data:${image_type};base64,${image_buffer}`
+}

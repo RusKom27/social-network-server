@@ -6,7 +6,6 @@ import {CustomRequest} from "../types/express/CustomRequest";
 const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
         const authorization_header = req.headers.authorization
-        console.log({authorization_header})
         if (!authorization_header && typeof authorization_header !== 'string') return next(ApiError.UnauthorizedError())
 
         const access_token = authorization_header.split(" ")[1]

@@ -1,5 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {UserService} from "../service";
+import {CustomRequest} from "../types/express/CustomRequest";
 
 class AuthController {
     async register(req: Request, res: Response, next: NextFunction) {
@@ -32,8 +33,16 @@ class AuthController {
         try {
             const {refresh_token} = req.cookies
             const userData = await UserService.refresh(refresh_token)
-            console.log({userData})
+
             res.status(200).send(userData)
+        } catch (err: any) {
+            next(err)
+        }
+    }
+
+    async me(req: CustomRequest, res: Response, next: NextFunction) {
+        try {
+            res.status(200).send(req.user_id)
         } catch (err: any) {
             next(err)
         }

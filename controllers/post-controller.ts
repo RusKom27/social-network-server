@@ -1,9 +1,10 @@
 import {NextFunction, Request, Response} from "express";
 import {PostService, UserService} from "../service";
 import {deletePunctuationMarks, getTagsFromText} from "../helpers/misc";
-import {checkToken} from "../helpers/validation";
+import {checkToken, checkUserId} from "../helpers/validation";
 import {sendMessage} from "../packages/ably";
 import ApiError from "../exeptions/api-error";
+import {CustomRequest} from "../types/express/CustomRequest";
 
 class PostController {
     async getAll (req: Request, res: Response, next: NextFunction) {
@@ -119,11 +120,11 @@ class PostController {
             next(err)
         }
     }
-    async likePost (req: Request, res: Response, next: NextFunction) {
+    async likePost (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            const token = checkToken(req.headers.authorization);
+            const user_id = checkUserId(req.user_id);
             let post = await PostService.getPostById(req.params.id)
-            const user = await UserService.getUserById(token)
+            const user = await UserService.getUserById(user_id)
             const user_index = post.likes.map(id => id.toString()).indexOf(user._id.toString())
 
             let likes = [...post.likes]

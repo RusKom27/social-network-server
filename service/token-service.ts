@@ -3,12 +3,11 @@ import {Types} from "mongoose";
 import {Token} from "../models";
 import jwt from "jsonwebtoken"
 import ApiError from "../exeptions/api-error";
-import UserDTO from "../data_transfer_objects/user-dto";
 
 class TokenService {
     generateTokens(payload: any) {
         const {jwt_access_secret, jwt_refresh_secret} = TokenService.#validateSecretKeys()
-        const access_token = jwt.sign(payload, jwt_access_secret, {expiresIn: "3s"})
+        const access_token = jwt.sign(payload, jwt_access_secret, {expiresIn: "30m"})
         const refresh_token = jwt.sign(payload, jwt_refresh_secret, {expiresIn: "30d"})
         return {
             access_token,

@@ -24,7 +24,6 @@ mongoose.connection.on('error', (error: mongoose.Error) => console.error(error))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cookieParser())
-
 app.use(cors(corsOptions))
 app.use(logger('dev'))
 app.use(express.static("public"))

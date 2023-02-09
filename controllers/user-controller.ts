@@ -1,12 +1,12 @@
 import {NextFunction, Request, Response} from "express";
-import {checkToken} from "../helpers/validation";
+import {getToken} from "../helpers/validation";
 import {addChannel, removeChannel, sendMessage} from "../packages/ably";
 import {UserService} from "../service";
 
 class UserController {
     async getByToken (req: Request, res: Response, next: NextFunction) {
         try {
-            const token = checkToken(req.headers.authorization);
+            const token = getToken(req.headers.authorization);
             const user = await UserService.getUserById(token)
             addChannel(user._id)
             return res.status(202).send(user)
@@ -71,7 +71,7 @@ class UserController {
 
     async closeConnection (req: Request, res: Response, next: NextFunction) {
         try {
-            const token = checkToken(req.headers.authorization);
+            const token = getToken(req.headers.authorization);
             const user = await UserService.getUserById(token)
             removeChannel(user._id)
             return res.status(202).send(user)
@@ -82,7 +82,7 @@ class UserController {
 
     async updateUser (req: Request, res: Response, next: NextFunction) {
         try {
-            const token = checkToken(req.headers.authorization);
+            const token = getToken(req.headers.authorization);
             const user = await UserService.getUserByIdAndUpdate(token, req.body)
             return res.status(200).json(user)
         } catch (err: any) {
@@ -92,7 +92,7 @@ class UserController {
 
     async subscribeUser (req: Request, res: Response, next: NextFunction) {
         try {
-            const token = checkToken(req.headers.authorization);
+            const token = getToken(req.headers.authorization);
             const current_user = await UserService.getUserById(token)
             const user = await UserService.getUserByFilter({login: req.params.user_login})
             if (user.subscribers.map(subscriber => subscriber.toString()).indexOf(current_user._id.toString()) < 0) {

@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {PostService, UserService} from "../service";
 import {deletePunctuationMarks, getTagsFromText} from "../helpers/misc";
-import {checkToken, checkUserId} from "../helpers/validation";
+import {getToken, getUserId} from "../helpers/validation";
 import {sendMessage} from "../packages/ably";
 import ApiError from "../exeptions/api-error";
 import {CustomRequest} from "../types/express/CustomRequest";
@@ -91,7 +91,7 @@ class PostController {
     }
     async createPost (req: Request, res: Response, next: NextFunction) {
         try {
-            const token = checkToken(req.headers.authorization);
+            const token = getToken(req.headers.authorization);
             const user = await UserService.getUserById(token)
             const post = await PostService.createPost(user._id, req.body.text, req.body.image, getTagsFromText(req.body.text))
             sendMessage(
@@ -106,7 +106,7 @@ class PostController {
     }
     async checkPost (req: Request, res: Response, next: NextFunction) {
         try {
-            const token = checkToken(req.headers.authorization);
+            const token = getToken(req.headers.authorization);
             let post = await PostService.getPostById(req.params.id)
             const user = await UserService.getUserById(token)
             let views = post.views
@@ -122,7 +122,7 @@ class PostController {
     }
     async likePost (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            const user_id = checkUserId(req.user_id);
+            const user_id = getUserId(req.user_id);
             let post = await PostService.getPostById(req.params.id)
             const user = await UserService.getUserById(user_id)
             const user_index = post.likes.map(id => id.toString()).indexOf(user._id.toString())
@@ -147,7 +147,7 @@ class PostController {
     }
     async deletePost (req: Request, res: Response, next: NextFunction) {
         try {
-            const token = checkToken(req.headers.authorization);
+            const token = getToken(req.headers.authorization);
             const current_user = await UserService.getUserById(token)
             let post = await PostService.getPostById(req.params.id)
             if (post.author_id.toString() === current_user._id.toString()) {

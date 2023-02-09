@@ -1,11 +1,11 @@
 import express from "express";
 import {MessageController} from "../controllers";
+import {authMiddleware} from "../middlewares";
 
 const router = express.Router();
 
-router.get('/', MessageController.getAllMessages)
-router.put('/check/:id', MessageController.checkMessage)
-router.post('/', MessageController.createMessage)
-router.post('/create_dialog', MessageController.createDialog)
+router.get('/get/:dialog_id', authMiddleware, MessageController.getMessages)
+router.put('/check/:id', authMiddleware, MessageController.checkMessage)
+router.post('/create', authMiddleware, MessageController.createMessage)
 
 export default router

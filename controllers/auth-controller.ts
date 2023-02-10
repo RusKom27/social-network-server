@@ -33,8 +33,7 @@ class AuthController {
         try {
             const {refresh_token} = req.cookies
             const userData = await UserService.refresh(refresh_token)
-
-            res.status(200).send(userData)
+            return res.status(200).send(userData)
         } catch (err: any) {
             next(err)
         }

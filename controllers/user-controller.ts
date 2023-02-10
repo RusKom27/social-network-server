@@ -4,17 +4,6 @@ import {addChannel, removeChannel, sendMessage} from "../packages/ably";
 import {UserService} from "../service";
 
 class UserController {
-    async getByToken (req: Request, res: Response, next: NextFunction) {
-        try {
-            const token = getToken(req.headers.authorization);
-            const user = await UserService.getUserById(token)
-            addChannel(user._id)
-            return res.status(202).send(user)
-        } catch (err: any) {
-            next(err)
-        }
-    }
-
     async getByLogin (req: Request, res: Response, next: NextFunction) {
         try {
             const user = await UserService.getUserByFilter({login: req.params.login})
@@ -64,17 +53,6 @@ class UserController {
                 password: req.body.password}
             )
             return res.status(200).send(user)
-        } catch (err: any) {
-            next(err)
-        }
-    }
-
-    async closeConnection (req: Request, res: Response, next: NextFunction) {
-        try {
-            const token = getToken(req.headers.authorization);
-            const user = await UserService.getUserById(token)
-            removeChannel(user._id)
-            return res.status(202).send(user)
         } catch (err: any) {
             next(err)
         }

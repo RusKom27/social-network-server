@@ -40,24 +40,11 @@ class AuthController {
         }
     }
 
-    async me(req: CustomRequest, res: Response, next: NextFunction) {
-        try {
-            res.status(200).send(req.user_id)
-        } catch (err: any) {
-            next(err)
-        }
-    }
-
     async logout(req: Request, res: Response, next: NextFunction) {
         try {
             const {refresh_token} = req.cookies
-
-            console.log(req.cookies)
-            console.log(req.signedCookies)
             const token = await UserService.logout(refresh_token)
-            return res
-                .clearCookie("refresh_token")
-                .json(token)
+            return res.clearCookie('refresh_token', {path: "/", domain: "localhost"}).json(token)
         } catch (err: any) {
             next(err)
         }

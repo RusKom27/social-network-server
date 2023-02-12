@@ -25,8 +25,8 @@ class MessageService {
     async createMessage(
         sender_id: Types.ObjectId | string,
         dialog_id: Types.ObjectId | string,
-        text: string,
-        image: string
+        text?: string,
+        image?: string
     ) {
         if (!text && image) throw ApiError.BadRequest("Message body is empty")
         const message = new Message({sender_id, dialog_id, text, image});

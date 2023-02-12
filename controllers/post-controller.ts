@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {PostService, UserService} from "../service";
 import {deletePunctuationMarks, getTagsFromText} from "../helpers/misc";
-import {getToken, getUserId} from "../helpers/validation";
+import {getUserId} from "../helpers/validation";
 import {sendMessage} from "../packages/ably";
 import ApiError from "../exeptions/api-error";
 import {CustomRequest} from "../types/express/CustomRequest";
@@ -89,26 +89,21 @@ class PostController {
             next(err)
         }
     }
-    async createPost (req: Request, res: Response, next: NextFunction) {
+    async createPost (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            const token = getToken(req.headers.authorization);
-            const user = await UserService.getUserById(token)
+            const user_id = getUserId(req.user_id);
+            const user = await UserService.getUserById(user_id)
             const post = await PostService.createPost(user._id, req.body.text, req.body.image, getTagsFromText(req.body.text))
-            sendMessage(
-                "new_post",
-                {...post.toObject(), user },
-                user.subscribers
-            )
-            return res.status(201).json({...post.toObject(), user })
+            return res.status(201).json(post)
         } catch (err: any) {
             next(err)
         }
     }
-    async checkPost (req: Request, res: Response, next: NextFunction) {
+    async checkPost (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            const token = getToken(req.headers.authorization);
+            const user_id = getUserId(req.user_id);
             let post = await PostService.getPostById(req.params.id)
-            const user = await UserService.getUserById(token)
+            const user = await UserService.getUserById(user_id)
             let views = post.views
             if (!post.views.map(id => id.toString()).includes(user._id.toString())) {
                 views.push(user._id)
@@ -145,10 +140,10 @@ class PostController {
             next(err)
         }
     }
-    async deletePost (req: Request, res: Response, next: NextFunction) {
+    async deletePost (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            const token = getToken(req.headers.authorization);
-            const current_user = await UserService.getUserById(token)
+            const user_id = getUserId(req.user_id);
+            const current_user = await UserService.getUserById(user_id)
             let post = await PostService.getPostById(req.params.id)
             if (post.author_id.toString() === current_user._id.toString()) {
                 post = await PostService.getPostByIdAndDelete(post._id)

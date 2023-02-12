@@ -11,14 +11,17 @@ const cors = require('cors')
 const logger = require('morgan')
 const corsOptions = {
     credentials: true,
-    origin: "http://localhost:3001",
+    origin: config.client,
     optionSuccessStatus: 200
 }
 
 const app = express()
 
 mongoose.set('strictQuery', false)
-mongoose.connect(config.mongo_url).then(r => console.log('Connected to database...'))
+mongoose.connect(config.mongo_url).then(r => {
+    console.log('Connected to database...')
+    console.log(config.client)
+})
 mongoose.connection.on('error', (error: mongoose.Error) => console.error(error))
 
 app.use(bodyParser.urlencoded({ extended: false }))

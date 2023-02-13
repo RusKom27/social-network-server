@@ -32,6 +32,12 @@ class MessageService {
         const message = new Message({sender_id, dialog_id, text, image});
         return await message.save()
     }
+
+    async getMessageByIdAndDelete(message_id: Types.ObjectId | string) {
+        const message = await Message.findByIdAndDelete(message_id, {returnDocument: 'after'}).lean().exec()
+        if (!message) throw ApiError.BadRequest("Message not found");
+        else return message
+    }
 }
 
 export default new MessageService()

@@ -9,25 +9,19 @@ import {errorMiddleware} from "./middlewares";
 
 const cors = require('cors')
 const logger = require('morgan')
-const corsOptions = {
-    credentials: true,
-    origin: config.client,
-    optionSuccessStatus: 200
-}
 
 const app = express()
 
 mongoose.set('strictQuery', false)
 mongoose.connect(config.mongo_url).then(r => {
     console.log('Connected to database...')
-    console.log(config.client)
 })
 mongoose.connection.on('error', (error: mongoose.Error) => console.error(error))
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cookieParser())
-app.use(cors(corsOptions))
+app.use(cors(config.corsOptions))
 app.use(logger('dev'))
 app.use(express.static("public"))
 app.use(router)

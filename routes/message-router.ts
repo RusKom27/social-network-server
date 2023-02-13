@@ -7,5 +7,6 @@ const router = express.Router();
 router.get('/get/:dialog_id', authMiddleware, MessageController.getMessages)
 router.put('/check/:id', authMiddleware, MessageController.checkMessage)
 router.post('/create', authMiddleware, MessageController.createMessage)
+router.delete('/delete/:id', authMiddleware, MessageController.deleteMessage)
 
 export default router

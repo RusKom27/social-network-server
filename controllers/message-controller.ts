@@ -6,10 +6,21 @@ import {CustomRequest} from "../types/express/CustomRequest";
 import ApiError from "../exeptions/api-error";
 
 class MessageController {
-    async getMessages (req: CustomRequest, res: Response, next: NextFunction) {
+
+    async getMessage(req: CustomRequest, res: Response, next: NextFunction) {
+        try {
+            const message = await MessageService.getMessageById(req.params.message_id);
+            return res.status(200).send(message);
+        } catch (err: any) {
+            next(err)
+        }
+    }
+
+    async getMessages(req: CustomRequest, res: Response, next: NextFunction) {
         try {
             const messages = await MessageService.getMessagesByDialogId(req.params.dialog_id);
-            return res.status(200).send(messages);
+            const messages_id = messages.map(message => message._id)
+            return res.status(200).send(messages_id);
         } catch (err: any) {
             next(err)
         }

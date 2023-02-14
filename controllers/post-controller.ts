@@ -10,12 +10,7 @@ class PostController {
     async getAll (req: Request, res: Response, next: NextFunction) {
         try {
             const posts = await PostService.getPosts()
-            const result = []
-            for (let i = 0; i < posts.length; i++) {
-                const user = await UserService.getUserById(posts[i].author_id)
-                result.push({...posts[i], user})
-            }
-            return res.status(200).json(posts)
+            return res.status(200).json(posts.map(post => post._id))
         } catch (err: any) {
             next(err)
         }
@@ -24,14 +19,7 @@ class PostController {
         try {
             const user = await UserService.getUserByFilter({login: req.params.user_login})
             const posts = await PostService.getPostsByAuthorId(user._id)
-            let result = []
-            for (let i = 0; i < posts.length; i++) {
-                result.push({
-                    ...posts[i],
-                    user: user
-                })
-            }
-            return res.status(200).send(result)
+            return res.status(200).send(posts.map(post => post._id))
         } catch (err: any) {
             next(err)
         }

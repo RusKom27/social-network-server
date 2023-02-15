@@ -1,7 +1,8 @@
 import {NextFunction, Request, Response} from "express";
-import {getToken} from "../helpers/validation";
+import {getToken, getUserId} from "../helpers/validation";
 import {addChannel, removeChannel, sendMessage} from "../packages/ably";
 import {UserService} from "../service";
+import {CustomRequest} from "../types/express/CustomRequest";
 
 class UserController {
     async getByLogin (req: Request, res: Response, next: NextFunction) {
@@ -68,31 +69,22 @@ class UserController {
         }
     }
 
-    async subscribeUser (req: Request, res: Response, next: NextFunction) {
+    async subscribeUser (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            const token = getToken(req.headers.authorization);
-            const current_user = await UserService.getUserById(token)
-            const user = await UserService.getUserByFilter({login: req.params.user_login})
+            const user_id = getUserId(req.user_id);
+            console.log(req.params.user_login)
+            const current_user = await UserService.getUserById(user_id)
+            const user = await UserService.getUserById(req.params.user_id)
             if (user.subscribers.map(subscriber => subscriber.toString()).indexOf(current_user._id.toString()) < 0) {
                 const changed_user = await UserService.getUserByIdAndUpdate(
                     user._id,
                     {subscribers: [...user.subscribers, current_user._id]}
-                )
-                sendMessage(
-                    "user_subscribed",
-                    current_user,
-                    [user._id]
                 )
                 return res.status(200).json(changed_user)
             } else {
                 const changed_user = await UserService.getUserByIdAndUpdate(
                     user._id,
                     {subscribers: user.subscribers.filter((user_id) => !user_id.equals(current_user._id))}
-                )
-                sendMessage(
-                    "user_unsubscribed",
-                    current_user,
-                    [user._id]
                 )
                 return res.status(200).json(changed_user)
             }

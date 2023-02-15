@@ -10,6 +10,6 @@ router.get('/id_array', UserController.getByIdArray)
 router.post('/create', UserController.createUser)
 router.post('/login', UserController.login)
 router.post('/update', authMiddleware, UserController.updateUser)
-router.put('/subscribe/:user_login', authMiddleware, UserController.subscribeUser)
+router.put('/subscribe/:user_id', authMiddleware, UserController.subscribeUser)
 
 export default router

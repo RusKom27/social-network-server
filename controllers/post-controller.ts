@@ -5,12 +5,28 @@ import {getUserId} from "../helpers/validation";
 import {sendMessage} from "../packages/ably";
 import ApiError from "../exeptions/api-error";
 import {CustomRequest} from "../types/express/CustomRequest";
+import {IPost} from "../interfaces";
+import {PostFilter} from "../types";
 
 class PostController {
-    async getAll (req: Request, res: Response, next: NextFunction) {
+    async getByQuery (req: Request, res: Response, next: NextFunction) {
         try {
-            const posts = await PostService.getPosts()
-            return res.status(200).json(posts.map(post => post._id))
+            const queries = Object.entries(req.query)
+
+            if (queries.length < 1) {
+                const posts = await PostService.getPostsByFilter({})
+                return res.status(200).json(posts.map(post => post._id))
+            } else {
+                const filter: PostFilter = {...req.query}
+                if (typeof filter.text === "string") filter.text = new RegExp(`${filter.text}`, "g")
+                if (typeof filter.likes === "string") filter.likes = {"$all": [filter.likes]}
+                console.log(filter)
+
+                const posts = await PostService.getPostsByFilter(filter)
+                return res.status(200).json(posts.map(post => post._id))
+            }
+
+
         } catch (err: any) {
             next(err)
         }
@@ -35,7 +51,7 @@ class PostController {
     async getPopularTags (req: Request, res: Response, next: NextFunction) {
         try {
             let tags: any = {}
-            const posts = await PostService.getPosts()
+            const posts = await PostService.getPostsByFilter({})
             for (const post of posts) {
                 for (const tag of post.tags) {
                     tags[tag] = tags[tag] ? tags[tag] + 1 : 1
@@ -56,20 +72,25 @@ class PostController {
     }
     async getActualTopics (req: Request, res: Response, next: NextFunction) {
         try {
-            let topics: any = {}
-            const posts = await PostService.getPosts()
+
+            type Topic = {value: string, count: number};
+
+            let topics: Topic[] = [];
+            const posts = await PostService.getPostsByFilter({})
             for (const post of posts) {
-                for (const word of post.text.split(" ")) {
-                    const topic = deletePunctuationMarks(word)
-                    topics[topic] = topics[topic] ? topics[topic] + 1 : 1
+                for (const word of post.text.trim().split(/\s+/)) {
+                    const topic_word = deletePunctuationMarks(word)
+                    const candidate = topics.find(topic => topic.value === topic_word);
+                    if (candidate) candidate.count += 1;
+                    else topics.push({value: topic_word, count: 1});
                 }
             }
-            let sorted_topics = Object.entries(topics)
-            sorted_topics.sort((first: any, second: any) => {
+
+            topics.sort((first: any, second: any) => {
                 return first[1] - second[1]
             })
-            const result = sorted_topics
-                .map(topic => ({[topic[0]]: topic[1]}))
+
+            const result = topics
                 .reverse()
                 .slice(0,10)
             return res.status(200).send(result)

@@ -32,6 +32,13 @@ class UserService {
         return user;
     }
 
+    async getUsersByUserFollows(user_id: Types.ObjectId | string) {
+        return await User
+            .find({"subscribers": {"$in": user_id}})
+            .lean()
+            .exec();
+    }
+
     async createUser(name: string, login: string, email: string, password: string) {
         const candidate = await User.findOne({email})
         if (candidate) {

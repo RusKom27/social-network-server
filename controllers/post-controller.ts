@@ -143,16 +143,9 @@ class PostController {
             let likes = [...post.likes]
             if (user_index > -1) likes.splice(user_index, 1)
             else likes.push(user._id)
-            post = await PostService.getPostByIdAndUpdate(post._id, {likes})
+            post = await PostService.getPostByIdAndUpdate(post._id, {likes, likesCount: likes.length})
 
             const author_user = await UserService.getUserById(post.author_id)
-
-            sendMessage(
-                "post_like",
-                {...post, user: author_user},
-                [author_user._id]
-            )
-
             return res.status(201).json({...post, user: author_user})
         } catch (err: any) {
             next(err)

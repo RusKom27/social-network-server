@@ -47,6 +47,10 @@ const UserSchema: Schema = new Schema({
         type: [Types.ObjectId],
         default: []
     },
+    subscribersCount: {
+        type: Number,
+        default: 0
+    },
     password: {
         type: String,
         required: true,

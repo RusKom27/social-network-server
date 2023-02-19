@@ -20,6 +20,10 @@ const PostSchema: Schema = new Schema({
         ref: 'User',
         default: []
     },
+    likesCount: {
+        type: Number,
+        default: 0,
+    },
     tags: {
         type: [String],
         default: []

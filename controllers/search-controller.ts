@@ -9,11 +9,12 @@ class SearchController {
                 topics: [],
                 users: [],
             }
+            console.log(req.query)
             if (!req.query.user_input) return res.send(results)
             const user_input = req.query.user_input.toString().toLowerCase()
-            const posts = await Post.find().sort("likes").exec()
+            const posts = await Post.find().sort("likesCount").exec()
             for (const post of posts) {
-                for (const word of post.text.split(" ")) {
+                for (const word of post.text.split(/\s+/g)) {
                     const topic = word.toLowerCase()
                     if (topic.includes(user_input) &&
                         !results.topics.includes(topic))

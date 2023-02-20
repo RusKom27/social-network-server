@@ -4,6 +4,7 @@ import Message from "./Message";
 import Post from "./Post";
 import User from "./User";
 import Token from "./Token"
+import Topic from "./Topic"
 
 export {
     Dialog,
@@ -11,5 +12,6 @@ export {
     Message,
     Post,
     User,
-    Token
+    Token,
+    Topic,
 }

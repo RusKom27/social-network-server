@@ -9,7 +9,6 @@ class SearchController {
                 topics: [],
                 users: [],
             }
-            console.log(req.query)
             if (!req.query.user_input) return res.send(results)
             const user_input = req.query.user_input.toString().toLowerCase()
             const posts = await Post.find().sort("likesCount").exec()
@@ -21,7 +20,7 @@ class SearchController {
                         results.topics.push(topic)
                 }
             }
-            const users = await User.find().sort("subscribers").exec()
+            const users = await User.find().sort("subscribersCount").exec()
             for (const user of users) {
                 if (user.name.includes(user_input)) results.users.push(user)
                 else if (user.login.includes(user_input)) results.users.push(user)

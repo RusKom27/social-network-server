@@ -5,6 +5,7 @@ import postRouter from "./post-router"
 import searchRouter from "./search-router"
 import userRouter from "./user-router"
 import dialogRouter from "./dialog-router";
+import topicRouter from "./topic-router";
 import express from "express";
 
 const router = express.Router()
@@ -16,5 +17,6 @@ router.use('/api/message', messageRouter)
 router.use('/api/dialog', dialogRouter)
 router.use('/api/image', imageRouter)
 router.use('/api/search', searchRouter)
+router.use('/api/topic', topicRouter)
 
 export default router

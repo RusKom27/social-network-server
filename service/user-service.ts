@@ -2,9 +2,8 @@ import {Types} from "mongoose";
 import {User} from "../models";
 import bcrypt from "bcrypt"
 import {TokenService} from "./index";
-import UserDTO from "../data_transfer_objects/user-dto";
 import ApiError from "../exeptions/api-error";
-import {IUser} from "../interfaces";
+import {UserFilter, UserSort} from "../types";
 
 class UserService {
     async getUserById(user_id: Types.ObjectId | string) {
@@ -13,10 +12,8 @@ class UserService {
         else return user;
     }
 
-    async getUserByFilter(filter: any) {
-        const user = await User.findOne(filter).lean().exec();
-        if (!user) throw ApiError.BadRequest("User not found");
-        else return user;
+    async getUsersByFilter(filter: UserFilter, sort?: any[]) {
+        return await User.findOne(filter).sort(sort).lean().exec();
     }
 
     async getUsersById(users_id: Types.ObjectId[] | string[]) {

@@ -14,10 +14,6 @@ class PostService {
         return await Post.find(filter).sort(sort).lean().exec()
     }
 
-    async getPostsByAuthorId(author_id: Types.ObjectId | string) {
-        return await Post.find({author_id}).lean().exec();
-    }
-
     async createPost(author_id: Types.ObjectId | string, text: string, image: string, tags: string[]) {
         const post = new Post({author_id, text, image, tags});
         return await post.save();

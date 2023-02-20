@@ -9,6 +9,7 @@ export default interface IUser extends Document {
     description: string;
     creation_date: Date;
     subscribers: Types.ObjectId[];
+    subscribersCount: number;
     images: {
         avatar_image: {
             big: string,

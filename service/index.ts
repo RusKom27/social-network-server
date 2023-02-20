@@ -4,6 +4,7 @@ import MessageService from "./message-service";
 import UserService from "./user-service";
 import PostService from "./post-service";
 import TokenService from "./token-service";
+import TopicService from "./topic-service";
 
 export {
     ImageService,
@@ -11,5 +12,6 @@ export {
     MessageService,
     UserService,
     PostService,
-    TokenService
+    TokenService,
+    TopicService,
 }

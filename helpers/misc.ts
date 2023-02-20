@@ -27,3 +27,10 @@ export const convertBufferToBase64 = (buffer: ArrayBufferLike) => {
 export const bufferToImageSource = (image_buffer: string, image_type: string) => {
     return `data:${image_type};base64,${image_buffer}`
 }
+
+export const isEmpty = (obj: Object) => {
+    for (const key in obj)
+        return false
+    return true
+}
+

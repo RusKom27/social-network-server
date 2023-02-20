@@ -7,6 +7,7 @@ export default interface IPost extends Document {
     image: string;
     tags: string[]
     likes: Types.ObjectId[];
+    likesCount: number;
     views: Types.ObjectId[];
     creation_date: Date;
 }

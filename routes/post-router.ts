@@ -5,11 +5,8 @@ import {authMiddleware} from "../middlewares";
 
 const router = express.Router()
 
-router.get('/query', PostController.getByQuery)
-router.get('/user_login/:user_login', PostController.getByUserLogin)
-router.get('/id/:post_id', PostController.getByPostId)
-router.get('/popular_tags', PostController.getPopularTags)
-router.get('/actual_topics', PostController.getActualTopics)
+router.get('/', PostController.getByQuery)
+router.get('/:post_id', PostController.getByPostId)
 router.post('/create', authMiddleware, PostController.createPost)
 router.put('/check/:id', authMiddleware, PostController.checkPost)
 router.put('/like/:id', authMiddleware, PostController.likePost)

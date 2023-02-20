@@ -5,6 +5,7 @@ import {getUserId} from "../helpers/validation";
 import ApiError from "../exeptions/api-error";
 import {CustomRequest} from "../types/express/CustomRequest";
 import {PostFilter, PostSort, OrderBy} from "../types";
+import {IPost} from "../interfaces";
 
 class PostController {
     async getByQuery (req: Request, res: Response, next: NextFunction) {

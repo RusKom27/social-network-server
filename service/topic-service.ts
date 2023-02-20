@@ -9,7 +9,7 @@ class TopicService {
     async getTopicById(topic_id: string) {
         const topic = await Topic.findById(topic_id).lean().exec();
         if (!topic) throw ApiError.BadRequest("Topic not found");
-
+        return topic;
     }
 
     async getTopicsByFilter(filter: TopicFilter, sort?: any[]) {

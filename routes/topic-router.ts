@@ -5,6 +5,6 @@ import TopicController from "../controllers/topic-controller";
 const router = express.Router()
 
 router.get('/', TopicController.getByQuery);
-router.get('/id/:topic_id', TopicController.getById);
+router.get('/:topic_id', TopicController.getById);
 
 export default router

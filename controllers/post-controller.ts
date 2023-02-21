@@ -1,39 +1,15 @@
 import {NextFunction, Request, Response} from "express";
 import {PostService, TopicService, UserService} from "../service";
-import {deletePunctuationMarks, getTagsFromText, isEmpty} from "../helpers/misc";
+import {getTagsFromText} from "../helpers/misc";
 import {getUserId} from "../helpers/validation";
 import ApiError from "../exeptions/api-error";
 import {CustomRequest} from "../types/express/CustomRequest";
-import {PostFilter, PostSort, OrderBy} from "../types";
-import {IPost} from "../interfaces";
 
 class PostController {
-    async getByQuery (req: Request, res: Response, next: NextFunction) {
-        const {query} = req
+    async getByQuery (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            if (isEmpty(query)) {
-                const posts = await PostService.getPostsByFilter({})
-                return res.status(200).json(posts.map(post => post._id))
-            } else {
-                const limit = typeof query.limit === "string" ? Number.parseInt(query.limit) : 5
-                const filter: PostFilter = {}
-                if (typeof query.author_id === "string") filter.author_id = query.author_id
-                if (typeof query.text === "string") filter.text = new RegExp(`${query.text}`, "g")
-                if (typeof query.likes === "string") filter.likes = {"$all": [query.likes]}
-                if (typeof query.follows === "string") {
-                    const followed_users = await UserService.getUsersByUserFollows(query.follows);
-                    filter.author_id = {"$in": followed_users.map(user => user._id.toString())}
-                }
-
-                const sort: PostSort = {}
-                if (typeof query.sort_by_popularity === "string")
-                    sort.sort_by_popularity = ["likesCount", query.sort_by_popularity as OrderBy]
-                if (typeof query.sort_by_relevance === "string")
-                    sort.sort_by_relevance = ["creation_date", query.sort_by_relevance as OrderBy]
-
-                const posts = await PostService.getPostsByFilter(filter, Object.values(sort), limit)
-                return res.status(200).json(posts.map(post => post._id))
-            }
+            const posts = await PostService.getPostsByFilter(req.filter, req.sort?.post, req.limit)
+            return res.status(200).json(posts.map(post => post._id))
         } catch (err: any) {
             next(err)
         }

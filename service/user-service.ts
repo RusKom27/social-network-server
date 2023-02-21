@@ -3,7 +3,6 @@ import {User} from "../models";
 import bcrypt from "bcrypt"
 import {TokenService} from "./index";
 import ApiError from "../exeptions/api-error";
-import {UserFilter, UserSort} from "../types";
 
 class UserService {
     async getUserById(user_id: Types.ObjectId | string) {
@@ -12,7 +11,7 @@ class UserService {
         else return user;
     }
 
-    async getUsersByFilter(filter: UserFilter, sort?: any[], limit = 10) {
+    async getUsersByFilter(filter: any, sort?: any[], limit = 10) {
         return await User.find(filter).sort(sort).limit(limit).lean().exec();
     }
 

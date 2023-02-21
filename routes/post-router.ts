@@ -1,11 +1,11 @@
 import express from "express";
 
 import {PostController} from "../controllers";
-import {authMiddleware} from "../middlewares";
+import {authMiddleware, filterMiddleware, limitMiddleware, sortMiddleware} from "../middlewares";
 
 const router = express.Router()
 
-router.get('/', PostController.getByQuery)
+router.get('/', filterMiddleware, sortMiddleware, limitMiddleware, PostController.getByQuery)
 router.get('/:post_id', PostController.getByPostId)
 router.post('/create', authMiddleware, PostController.createPost)
 router.put('/check/:id', authMiddleware, PostController.checkPost)

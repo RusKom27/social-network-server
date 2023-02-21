@@ -1,34 +1,16 @@
 import {NextFunction, Request, Response} from "express";
 import {getToken, getUserId} from "../helpers/validation";
-import {PostService, UserService} from "../service";
+import {UserService} from "../service";
 import {CustomRequest} from "../types/express/CustomRequest";
 import {Types} from "mongoose";
-import {OrderBy, UserFilter, UserSort} from "../types";
-import {isEmpty} from "../helpers/misc";
 
 
 class UserController {
-    async getByQuery (req: Request, res: Response, next: NextFunction) {
-        const {query} = req
-
+    async getByQuery (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            if (isEmpty(query)) {
-                const users = await UserService.getUsersByFilter({})
-                return res.status(200).json(users.map(user => user._id))
-            } else {
-                const limit = typeof query.limit === "string" ? Number.parseInt(query.limit) : 5
+            const users = await UserService.getUsersByFilter(req.filter, req.sort?.user, req.limit);
+            return res.status(200).send(users.map(user => user._id))
 
-                const filter: UserFilter = {}
-                if (typeof query.login === "string") filter.login = new RegExp(query.login, "i")
-                if (typeof query.name === "string") filter.name = new RegExp(query.name, "i")
-
-                const sort: UserSort = {}
-                if (typeof query.sort_by_popularity === "string")
-                    sort.sort_by_popularity = ["subscribersCount", query.sort_by_popularity as OrderBy]
-                const users = await UserService.getUsersByFilter(filter, Object.values(sort), limit);
-
-                return res.status(200).send(users.map(user => user._id))
-            }
         } catch (err: any) {
             next(err)
         }

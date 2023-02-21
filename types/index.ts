@@ -6,8 +6,10 @@ export type UserFilter = {
     subscribers?: { "$all": string[] },
 }
 
-export type UserSort = {
-    sort_by_popularity?: ["subscribersCount", OrderBy],
+export type Sort = {
+    user?: [string, OrderBy][]
+    post?: [string, OrderBy][]
+    topic?: [string, OrderBy][]
 }
 
 export type PostFilter = {

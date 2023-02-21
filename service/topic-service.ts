@@ -12,8 +12,9 @@ class TopicService {
         return topic;
     }
 
-    async getTopicsByFilter(filter: TopicFilter, sort?: any[]) {
-        return await Topic.find(filter).sort(sort).lean().exec()
+    async getTopicsByFilter(filter: TopicFilter, sort?: any[], limit = 10) {
+        console.log(limit)
+        return await Topic.find(filter).sort(sort).limit(limit).lean().exec()
     }
 
     async addTopicsFromPost(post: IPost) {

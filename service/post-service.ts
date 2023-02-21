@@ -10,8 +10,8 @@ class PostService {
         else return post;
     }
 
-    async getPostsByFilter(filter: PostFilter, sort?: any[]) {
-        return await Post.find(filter).sort(sort).lean().exec()
+    async getPostsByFilter(filter: PostFilter, sort?: any[], limit=10) {
+        return await Post.find(filter).sort(sort).limit(limit).lean().exec()
     }
 
     async createPost(author_id: Types.ObjectId | string, text: string, image: string, tags: string[]) {

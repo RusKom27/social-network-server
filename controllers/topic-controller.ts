@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {isEmpty} from "../helpers/misc";
-import {PostService, TopicService} from "../service";
+import {TopicService} from "../service";
 import {OrderBy, TopicFilter, TopicSort} from "../types";
 
 class TopicController {
@@ -20,14 +20,15 @@ class TopicController {
                 const topics = await TopicService.getTopicsByFilter({})
                 return res.status(200).json(topics.map(topic => topic._id))
             } else {
+                const limit = typeof query.limit === "string" ? Number.parseInt(query.limit) : 5
                 const filter: TopicFilter = {}
-                if (typeof query.name === "string") filter.name = query.name
+                if (typeof query.name === "string") filter.name = new RegExp(query.name, "i")
 
                 const sort: TopicSort = {}
                 if (typeof query.sort_by_popularity === "string")
                     sort.sort_by_popularity = ["count", query.sort_by_popularity as OrderBy]
 
-                const topics = await TopicService.getTopicsByFilter(filter, Object.values(sort))
+                const topics = await TopicService.getTopicsByFilter(filter, Object.values(sort), limit)
                 return res.status(200).json(topics.map(topic => topic._id))
             }
 

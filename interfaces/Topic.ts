@@ -5,4 +5,6 @@ export default interface Topic extends Document {
     name: string;
     posts: Types.ObjectId[];
     count: number;
+    createdAt: Date;
+    updatedAt: Date;
 }

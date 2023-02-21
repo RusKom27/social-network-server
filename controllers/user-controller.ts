@@ -13,18 +13,21 @@ class UserController {
 
         try {
             if (isEmpty(query)) {
-                const posts = await PostService.getPostsByFilter({})
-                return res.status(200).json(posts.map(post => post._id))
+                const users = await UserService.getUsersByFilter({})
+                return res.status(200).json(users.map(user => user._id))
             } else {
+                const limit = typeof query.limit === "string" ? Number.parseInt(query.limit) : 5
+
                 const filter: UserFilter = {}
-                if (typeof query.login === "string") filter.login = query.login
-                if (typeof query.name === "string") filter.name = query.name
+                if (typeof query.login === "string") filter.login = new RegExp(query.login, "i")
+                if (typeof query.name === "string") filter.name = new RegExp(query.name, "i")
 
                 const sort: UserSort = {}
                 if (typeof query.sort_by_popularity === "string")
                     sort.sort_by_popularity = ["subscribersCount", query.sort_by_popularity as OrderBy]
-                const users = await UserService.getUsersByFilter(filter, Object.values(sort))
-                return res.status(200).send(users)
+                const users = await UserService.getUsersByFilter(filter, Object.values(sort), limit);
+
+                return res.status(200).send(users.map(user => user._id))
             }
         } catch (err: any) {
             next(err)

@@ -15,6 +15,7 @@ class PostController {
                 const posts = await PostService.getPostsByFilter({})
                 return res.status(200).json(posts.map(post => post._id))
             } else {
+                const limit = typeof query.limit === "string" ? Number.parseInt(query.limit) : 5
                 const filter: PostFilter = {}
                 if (typeof query.author_id === "string") filter.author_id = query.author_id
                 if (typeof query.text === "string") filter.text = new RegExp(`${query.text}`, "g")
@@ -30,7 +31,7 @@ class PostController {
                 if (typeof query.sort_by_relevance === "string")
                     sort.sort_by_relevance = ["creation_date", query.sort_by_relevance as OrderBy]
 
-                const posts = await PostService.getPostsByFilter(filter, Object.values(sort))
+                const posts = await PostService.getPostsByFilter(filter, Object.values(sort), limit)
                 return res.status(200).json(posts.map(post => post._id))
             }
         } catch (err: any) {

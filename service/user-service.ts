@@ -12,8 +12,8 @@ class UserService {
         else return user;
     }
 
-    async getUsersByFilter(filter: UserFilter, sort?: any[]) {
-        return await User.findOne(filter).sort(sort).lean().exec();
+    async getUsersByFilter(filter: UserFilter, sort?: any[], limit = 10) {
+        return await User.find(filter).sort(sort).limit(limit).lean().exec();
     }
 
     async getUsersById(users_id: Types.ObjectId[] | string[]) {

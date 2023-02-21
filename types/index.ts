@@ -1,8 +1,8 @@
 
 
 export type UserFilter = {
-    login?: string,
-    name?: string,
+    login?: RegExp,
+    name?: RegExp,
     subscribers?: { "$all": string[] },
 }
 
@@ -22,7 +22,7 @@ export type PostSort = {
 }
 
 export type TopicFilter = {
-    name?: string,
+    name?: RegExp,
 }
 
 export type TopicSort = {

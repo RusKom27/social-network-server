@@ -1,10 +1,14 @@
-import mongoose, {Schema, SchemaTypes} from "mongoose";
+import mongoose, {Schema, Types} from "mongoose";
 import {IImage} from "../interfaces";
 
 const ImageSchema: Schema = new Schema({
     name: {
         type: String,
         require: true,
+    },
+    fileId: {
+        type: Types.ObjectId,
+        required: true,
     },
     // image: {
     //     type: SchemaTypes.Buffer,

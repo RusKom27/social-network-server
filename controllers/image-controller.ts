@@ -1,12 +1,11 @@
 import mongoose, {Types} from "mongoose";
+import {GridFSBucket, GridFSFile} from "mongodb";
 import {NextFunction, Request, Response} from "express";
 import {getFile} from "../helpers/validation";
 import {ImageService} from "../service";
-import {convertBufferToBase64} from "../helpers/misc";
-import Grid from "gridfs-stream";
 
 const conn = mongoose.connection;
-let gfs;
+let gfs: GridFSBucket;
 
 mongoose.connection.once('open', () => {
     gfs = new mongoose.mongo.GridFSBucket(conn.db, {
@@ -17,17 +16,14 @@ mongoose.connection.once('open', () => {
 class ImageController {
     async upload(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log(req.file);
-            const file = getFile(req.file);
+            const file = getFile(req.file) as any;
+
             const image = await ImageService.createImage(
                 file.originalname,
-                // new Types.Buffer(file.buffer),
-                file.mimetype
+                file.mimetype,
+                file.id,
             );
-            return res.status(200).send({
-                ...image,
-                // image: convertBufferToBase64(image.image.buffer),
-            });
+            return res.status(200).send(image);
 
         } catch (err: any) {
             next(err);
@@ -47,11 +43,10 @@ class ImageController {
 
     async getByFileName(req: Request, res: Response, next: NextFunction) {
         try {
-            const image = await ImageService.getImage(req.params.filename);
-            return res.status(200).send({
-                ...image,
-                // image: convertBufferToBase64(image.image.buffer),
-            });
+            const files = await gfs.find({filename: req.params.filename}).toArray();
+            return gfs
+                .openDownloadStreamByName(files.length > 0 ? req.params.filename : "default_image.png")
+                .pipe(res);
         } catch (err: any) {
             next(err);
         }

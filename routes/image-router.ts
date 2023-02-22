@@ -7,7 +7,6 @@ import config from "../config/config";
 const storage = new GridFsStorage({
     url: config.mongo_url,
     file: (req, file) => {
-        console.log(req, file);
         return new Promise((resolve) => {
             const fileInfo = {
                 filename: file.originalname,

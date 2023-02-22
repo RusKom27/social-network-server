@@ -24,9 +24,10 @@ class ImageService {
         }));
     }
 
-    async createImage(name: string, contentType: string) {
+    async createImage(name: string, contentType: string, fileId: Types.ObjectId) {
         const new_image = {
             name,
+            fileId,
             contentType,
         };
         // const image = await Image.findOne({name}).exec();

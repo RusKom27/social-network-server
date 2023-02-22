@@ -4,13 +4,13 @@ import ApiError from "../exeptions/api-error";
 
 class MessageService {
     async getMessageById(message_id: Types.ObjectId | string) {
-        const message = await Message.findById(message_id).lean().exec()
-        if (!message) throw ApiError.BadRequest("Message not found")
-        else return message
+        const message = await Message.findById(message_id).lean().exec();
+        if (!message) throw ApiError.BadRequest("Message not found");
+        else return message;
     }
 
     async getMessagesByDialogId(dialog_id: Types.ObjectId | string) {
-        return await Message.find({dialog_id}).lean().exec()
+        return await Message.find({dialog_id}).lean().exec();
     }
 
     async getMessageByIdAndUpdate(message_id: Types.ObjectId | string, updates: any) {
@@ -28,16 +28,16 @@ class MessageService {
         text?: string,
         image?: string
     ) {
-        if (!text && image) throw ApiError.BadRequest("Message body is empty")
+        if (!text && image) throw ApiError.BadRequest("Message body is empty");
         const message = new Message({sender_id, dialog_id, text, image});
-        return await message.save()
+        return await message.save();
     }
 
     async getMessageByIdAndDelete(message_id: Types.ObjectId | string) {
-        const message = await Message.findByIdAndDelete(message_id, {returnDocument: 'after'}).lean().exec()
+        const message = await Message.findByIdAndDelete(message_id, {returnDocument: 'after'}).lean().exec();
         if (!message) throw ApiError.BadRequest("Message not found");
-        else return message
+        else return message;
     }
 }
 
-export default new MessageService()
+export default new MessageService();

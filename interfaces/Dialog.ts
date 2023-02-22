@@ -1,10 +1,13 @@
-import {Document, Types} from "mongoose"
+import {Document, Types} from "mongoose";
 
-export default interface IDialog extends Document {
+interface IDialog extends Document {
     _id: Types.ObjectId
     members_id: Types.ObjectId[]
-    creation_date: Date
+    createdAt: Date;
+    updatedAt: Date;
 }
+
+export default IDialog;
 
 // {
 //     "_id": {

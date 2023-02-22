@@ -1,4 +1,4 @@
-import mongoose, {Schema, Types} from "mongoose"
+import mongoose, {Schema, Types} from "mongoose";
 import {IDialog} from "../interfaces";
 
 const DialogSchema: Schema = new Schema({
@@ -7,10 +7,6 @@ const DialogSchema: Schema = new Schema({
         ref: 'User',
         required: true,
     },
-    creation_date: {
-        type: Date,
-        default: Date.now
-    }
-})
+}, {timestamps: true});
 
-export default mongoose.model<IDialog>('Dialog', DialogSchema, 'dialogs')
+export default mongoose.model<IDialog>('Dialog', DialogSchema, 'dialogs');

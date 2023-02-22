@@ -1,6 +1,6 @@
-import {Document, Types} from "mongoose"
+import {Document, Types} from "mongoose";
 
-export default interface IPost extends Document {
+interface IPost extends Document {
     _id: Types.ObjectId;
     author_id: Types.ObjectId;
     text: string;
@@ -9,8 +9,11 @@ export default interface IPost extends Document {
     likes: Types.ObjectId[];
     likesCount: number;
     views: Types.ObjectId[];
-    creation_date: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
+
+export default IPost;
 
 // {
 //     "_id": {

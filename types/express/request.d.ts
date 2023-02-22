@@ -1,6 +1,6 @@
 import {Sort} from "../index";
 
-export {}
+export {};
 
 declare global {
     namespace Express {

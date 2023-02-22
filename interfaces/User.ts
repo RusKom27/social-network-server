@@ -1,13 +1,14 @@
-import {Document, Types} from "mongoose"
+import {Document, Types} from "mongoose";
 
-export default interface IUser extends Document {
+interface IUser extends Document {
     _id: Types.ObjectId;
     name: string;
     login: string;
     email: string;
     password: string;
     description: string;
-    creation_date: Date;
+    createdAt: Date;
+    updatedAt: Date;
     subscribers: Types.ObjectId[];
     subscribersCount: number;
     images: {
@@ -21,6 +22,8 @@ export default interface IUser extends Document {
         }
     }
 }
+
+export default IUser;
 
 // {
 //     "_id": {

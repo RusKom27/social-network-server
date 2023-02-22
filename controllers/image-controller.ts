@@ -7,40 +7,44 @@ import {convertBufferToBase64} from "../helpers/misc";
 class ImageController {
     async upload(req: Request, res: Response, next: NextFunction) {
         try {
-            const file = getFile(req.file)
-            let image = await ImageService.createImage(file.originalname, new Types.Buffer(file.buffer), file.mimetype)
+            const file = getFile(req.file);
+            const image = await ImageService.createImage(
+                file.originalname,
+                new Types.Buffer(file.buffer),
+                file.mimetype
+            );
             return res.status(200).send({
                 ...image,
-                image: convertBufferToBase64(image.image.buffer)
-            })
+                image: convertBufferToBase64(image.image.buffer),
+            });
 
         } catch (err: any) {
-            next(err)
+            next(err);
         }
     }
 
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const images = await ImageService.getImages()
+            const images = await ImageService.getImages();
             return res.status(200).send({
-                images
-            })
+                images,
+            });
         } catch (err: any) {
-            next(err)
+            next(err);
         }
     }
 
     async getByFileName(req: Request, res: Response, next: NextFunction) {
         try {
-            const image = await ImageService.getImage(req.params.filename)
+            const image = await ImageService.getImage(req.params.filename);
             return res.status(200).send({
                 ...image,
-                image: convertBufferToBase64(image.image.buffer)
-            })
+                image: convertBufferToBase64(image.image.buffer),
+            });
         } catch (err: any) {
-            next(err)
+            next(err);
         }
     }
 }
 
-export default new ImageController()
+export default new ImageController();

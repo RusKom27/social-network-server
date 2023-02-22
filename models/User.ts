@@ -1,4 +1,4 @@
-import mongoose, {Schema, Types} from "mongoose"
+import mongoose, {Schema, Types} from "mongoose";
 import {IUser} from "../interfaces";
 
 const UserSchema: Schema = new Schema({
@@ -30,7 +30,7 @@ const UserSchema: Schema = new Schema({
             small: {
                 type: String,
                 default: "default_small_avatar_image.jpg",
-            }
+            },
         },
         profile_image: {
             big: {
@@ -40,25 +40,21 @@ const UserSchema: Schema = new Schema({
             small: {
                 type: String,
                 default: "default_small_profile_image.png",
-            }
+            },
         },
     },
     subscribers: {
         type: [Types.ObjectId],
-        default: []
+        default: [],
     },
     subscribersCount: {
         type: Number,
-        default: 0
+        default: 0,
     },
     password: {
         type: String,
         required: true,
     },
-    creation_date: {
-        type: Date,
-        default: Date.now
-    }
-})
+}, {timestamps: true});
 
-export default mongoose.model<IUser>('User', UserSchema, 'users')
+export default mongoose.model<IUser>('User', UserSchema, 'users');

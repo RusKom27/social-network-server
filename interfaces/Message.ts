@@ -1,14 +1,17 @@
-import {Document, Types} from "mongoose"
+import {Document, Types} from "mongoose";
 
-export default interface IMessage extends Document {
+interface IMessage extends Document {
     _id: Types.ObjectId
     sender_id: Types.ObjectId
     dialog_id: Types.ObjectId
     text: string
     image: string
     checked: boolean
-    creation_date: Date
+    createdAt: Date;
+    updatedAt: Date;
 }
+
+export default IMessage;
 
 // {
 //     "_id": {

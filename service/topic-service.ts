@@ -13,26 +13,25 @@ class TopicService {
     }
 
     async getTopicsByFilter(filter: TopicFilter, sort?: any[], limit = 10) {
-        console.log(limit)
-        return await Topic.find(filter).sort(sort).limit(limit).lean().exec()
+        return await Topic.find(filter).sort(sort).limit(limit).lean().exec();
     }
 
     async addTopicsFromPost(post: IPost) {
         for (const word of post.text.trim().split(/\s+/)) {
-            const topic_name = deletePunctuationMarks(word)
+            const topic_name = deletePunctuationMarks(word);
             const candidate = await Topic.findOne({name: topic_name}).exec();
             if (candidate)
                 await Topic.findByIdAndUpdate(candidate._id, {
                     count: candidate.count + 1,
-                    posts: [...candidate.posts, post._id]
-                })
+                    posts: [...candidate.posts, post._id],
+                });
             else
                 await Topic.create({
                     name: topic_name,
-                    posts: [post._id]
-                })
+                    posts: [post._id],
+                });
         }
     }
 }
 
-export default new TopicService()
+export default new TopicService();

@@ -1,16 +1,16 @@
-import mongoose, {Schema, Types} from "mongoose"
+import mongoose, {Schema, Types} from "mongoose";
 import {IMessage} from "../interfaces";
 
 const MessageSchema: Schema = new Schema({
     sender_id: {
         type: Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
     },
     dialog_id: {
         type: Types.ObjectId,
         ref: 'Dialog',
-        required: true
+        required: true,
     },
     text: {
         type: String,
@@ -24,10 +24,6 @@ const MessageSchema: Schema = new Schema({
         type: Boolean,
         default: false,
     },
-    creation_date: {
-        type: Date,
-        default: Date.now
-    }
-})
+}, {timestamps: true});
 
-export default mongoose.model<IMessage>('Message', MessageSchema, 'messages')
+export default mongoose.model<IMessage>('Message', MessageSchema, 'messages');

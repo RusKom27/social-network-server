@@ -1,6 +1,6 @@
-import {Document, Types} from "mongoose"
+import {Document, Types} from "mongoose";
 
-export default interface Topic extends Document {
+interface ITopic extends Document {
     _id: Types.ObjectId;
     name: string;
     posts: Types.ObjectId[];
@@ -8,3 +8,5 @@ export default interface Topic extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export default ITopic;

@@ -11,7 +11,7 @@ class PostService {
     }
 
     async getPostsByFilter(filter: PostFilter, sort?: any[], limit=10) {
-        return await Post.find(filter).sort(sort).limit(limit).lean().exec()
+        return await Post.find(filter).sort(sort).limit(limit).lean().exec();
     }
 
     async createPost(author_id: Types.ObjectId | string, text: string, image: string, tags: string[]) {
@@ -29,10 +29,10 @@ class PostService {
     }
 
     async getPostByIdAndDelete(post_id: Types.ObjectId | string) {
-        const post = await Post.findByIdAndDelete(post_id, {returnDocument: 'after'}).lean().exec()
+        const post = await Post.findByIdAndDelete(post_id, {returnDocument: 'after'}).lean().exec();
         if (!post) throw ApiError.BadRequest("Post not found");
-        else return post
+        else return post;
     }
 }
 
-export default new PostService()
+export default new PostService();

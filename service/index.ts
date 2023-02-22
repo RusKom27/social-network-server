@@ -14,4 +14,4 @@ export {
     PostService,
     TokenService,
     TopicService,
-}
+};

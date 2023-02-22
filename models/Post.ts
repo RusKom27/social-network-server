@@ -1,11 +1,11 @@
-import mongoose, {Schema, Types} from "mongoose"
+import mongoose, {Schema, Types} from "mongoose";
 import {IPost} from "../interfaces";
 
 const PostSchema: Schema = new Schema({
     author_id: {
         type: Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
     },
     text: {
         type: String,
@@ -18,7 +18,7 @@ const PostSchema: Schema = new Schema({
     likes: {
         type: [Types.ObjectId],
         ref: 'User',
-        default: []
+        default: [],
     },
     likesCount: {
         type: Number,
@@ -26,17 +26,13 @@ const PostSchema: Schema = new Schema({
     },
     tags: {
         type: [String],
-        default: []
+        default: [],
     },
     views: {
         type: [Types.ObjectId],
         ref: 'User',
         default: [],
     },
-    creation_date: {
-        type: Date,
-        default: Date.now
-    }
-})
+}, {timestamps: true});
 
-export default mongoose.model<IPost>('Post', PostSchema, 'posts')
+export default mongoose.model<IPost>('Post', PostSchema, 'posts');

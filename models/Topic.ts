@@ -1,4 +1,4 @@
-import mongoose, {Schema, Types} from "mongoose"
+import mongoose, {Schema, Types} from "mongoose";
 import {ITopic} from "../interfaces";
 
 const TopicSchema: Schema = new Schema({
@@ -9,12 +9,12 @@ const TopicSchema: Schema = new Schema({
     posts: {
         type: [Types.ObjectId],
         ref: 'Post',
-        required: true
+        required: true,
     },
     count: {
         type: Number,
-        default: 1
-    }
-}, {timestamps: true})
+        default: 1,
+    },
+}, {timestamps: true});
 
-export default mongoose.model<ITopic>('Topic', TopicSchema, 'topics')
+export default mongoose.model<ITopic>('Topic', TopicSchema, 'topics');

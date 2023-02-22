@@ -1,17 +1,17 @@
-import mongoose, {Schema, SchemaTypes} from "mongoose"
+import mongoose, {Schema, SchemaTypes} from "mongoose";
 import {IImage} from "../interfaces";
 
 const ImageSchema: Schema = new Schema({
     name: {
         type: String,
-        require: true
+        require: true,
     },
     image: {
         type: SchemaTypes.Buffer,
     },
     contentType: {
-        type: String
-    }
+        type: String,
+    },
 }, {timestamps: true});
 
-export default mongoose.model<IImage>('Image', ImageSchema, 'images')
+export default mongoose.model<IImage>('Image', ImageSchema, 'images');

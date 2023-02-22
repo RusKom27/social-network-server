@@ -3,7 +3,7 @@ import {Document, Types} from "mongoose";
 interface IImage extends Document {
     _id: Types.ObjectId
     name: string
-    image: Types.Buffer
+    // image: Types.Buffer
     contentType: string
     createdAt: Date;
     updatedAt: Date;

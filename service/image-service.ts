@@ -10,7 +10,7 @@ class ImageService {
         else {
             return {
                 ...image,
-                src: bufferToImageSource(image.image.toString("base64"), image.contentType),
+                // src: bufferToImageSource(image.image.toString("base64"), image.contentType),
             };
         }
     }
@@ -20,25 +20,24 @@ class ImageService {
 
         return images.map(image => ({
             ...image,
-            src: bufferToImageSource(image.image.toString("base64"), image.contentType),
+            // src: bufferToImageSource(image.image.toString("base64"), image.contentType),
         }));
     }
 
-    async createImage(name: string, buffer: Types.Buffer, contentType: string) {
+    async createImage(name: string, contentType: string) {
         const new_image = {
             name,
-            image: buffer,
             contentType,
         };
-        const image = await Image.findOne({name}).exec();
-        if (image) {
-            image.image = new_image.image;
-            return await image.save();
-        }
+        // const image = await Image.findOne({name}).exec();
+        // if (image) {
+        //     image.image = new_image.image;
+        //     return await image.save();
+        // }
         const created_image = await Image.create(new_image);
         return {
             ...created_image,
-            src: bufferToImageSource(created_image.image.toString("base64"), created_image.contentType),
+            // src: bufferToImageSource(created_image.image.toString("base64"), created_image.contentType),
         };
     }
 }

@@ -1,5 +1,5 @@
 import config from "./config/config";
-import mongoose from "mongoose";
+import mongoose, {Types} from "mongoose";
 import bodyParser from 'body-parser';
 import express from 'express';
 import cookieParser from "cookie-parser";
@@ -15,6 +15,7 @@ mongoose.set('strictQuery', false);
 mongoose.connect(config.mongo_url).then(() => {
     console.log('Connected to database...');
 });
+
 mongoose.connection.on('error', (error: mongoose.Error) => console.error(error));
 
 app.use(bodyParser.urlencoded({ extended: false }));

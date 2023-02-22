@@ -1,21 +1,32 @@
-import {Types} from "mongoose";
+import mongoose, {Types} from "mongoose";
 import {NextFunction, Request, Response} from "express";
 import {getFile} from "../helpers/validation";
 import {ImageService} from "../service";
 import {convertBufferToBase64} from "../helpers/misc";
+import Grid from "gridfs-stream";
+
+const conn = mongoose.connection;
+let gfs;
+
+mongoose.connection.once('open', () => {
+    gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+        bucketName: "uploads",
+    });
+});
 
 class ImageController {
     async upload(req: Request, res: Response, next: NextFunction) {
         try {
+            console.log(req.file);
             const file = getFile(req.file);
             const image = await ImageService.createImage(
                 file.originalname,
-                new Types.Buffer(file.buffer),
+                // new Types.Buffer(file.buffer),
                 file.mimetype
             );
             return res.status(200).send({
                 ...image,
-                image: convertBufferToBase64(image.image.buffer),
+                // image: convertBufferToBase64(image.image.buffer),
             });
 
         } catch (err: any) {
@@ -39,7 +50,7 @@ class ImageController {
             const image = await ImageService.getImage(req.params.filename);
             return res.status(200).send({
                 ...image,
-                image: convertBufferToBase64(image.image.buffer),
+                // image: convertBufferToBase64(image.image.buffer),
             });
         } catch (err: any) {
             next(err);

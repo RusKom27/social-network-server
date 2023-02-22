@@ -6,9 +6,9 @@ const ImageSchema: Schema = new Schema({
         type: String,
         require: true,
     },
-    image: {
-        type: SchemaTypes.Buffer,
-    },
+    // image: {
+    //     type: SchemaTypes.Buffer,
+    // },
     contentType: {
         type: String,
     },

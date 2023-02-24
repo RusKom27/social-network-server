@@ -3,10 +3,14 @@ import {Message} from "../models";
 import ApiError from "../exeptions/api-error";
 
 class MessageService {
-    async getMessageById(message_id: Types.ObjectId | string) {
-        const message = await Message.findById(message_id).lean().exec();
+    async getMessageById(id: Types.ObjectId | string) {
+        const message = await Message.findById(id).lean().exec();
         if (!message) throw ApiError.BadRequest("Message not found");
         else return message;
+    }
+
+    async getMessagesByFilter(dialog_id: string, filter: any, sort?: any[], limit=10) {
+        return await Message.findOne({dialog_id}).find(filter).sort(sort).limit(limit).lean().exec();
     }
 
     async getMessagesByDialogId(dialog_id: Types.ObjectId | string) {

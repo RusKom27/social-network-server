@@ -1,7 +1,6 @@
 import {Types} from "mongoose";
 import {Post} from "../models";
 import ApiError from "../exeptions/api-error";
-import {PostFilter, PostSort, OrderBy} from "../types";
 
 class PostService {
     async getPostById(post_id: Types.ObjectId | string) {
@@ -10,7 +9,7 @@ class PostService {
         else return post;
     }
 
-    async getPostsByFilter(filter: PostFilter, sort?: any[], limit=10) {
+    async getPostsByFilter(filter: any, sort?: any[], limit=10) {
         return await Post.find(filter).sort(sort).limit(limit).lean().exec();
     }
 

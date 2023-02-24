@@ -9,7 +9,7 @@ class MessageController {
 
     async getMessage(req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            const message = await MessageService.getMessageById(req.params.message_id);
+            const message = await MessageService.getMessageById(req.params.id);
             return res.status(200).send(message);
         } catch (err: any) {
             next(err);
@@ -21,6 +21,20 @@ class MessageController {
             const messages = await MessageService.getMessagesByDialogId(req.params.dialog_id);
             const messages_id = messages.map(message => message._id);
             return res.status(200).send(messages_id);
+        } catch (err: any) {
+            next(err);
+        }
+    }
+
+    async getByQuery (req: CustomRequest, res: Response, next: NextFunction) {
+        try {
+            const messages = await MessageService.getMessagesByFilter(
+                req.params.dialog_id,
+                req.filter,
+                req.sort?.message,
+                req.limit
+            );
+            return res.status(200).json(messages.map(message => message._id));
         } catch (err: any) {
             next(err);
         }

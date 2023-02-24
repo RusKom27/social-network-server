@@ -1,12 +1,19 @@
 import express from "express";
 import {MessageController} from "../controllers";
-import {authMiddleware} from "../middlewares";
+import {authMiddleware, filterMiddleware, limitMiddleware, sortMiddleware} from "../middlewares";
 
 const router = express.Router();
 
 
-router.get('/all/:dialog_id', authMiddleware, MessageController.getMessages);
-router.get('/id/:message_id', authMiddleware, MessageController.getMessage);
+router.get('/:id', authMiddleware, MessageController.getMessage);
+router.get(
+    '/dialog/:dialog_id',
+    authMiddleware,
+    filterMiddleware,
+    sortMiddleware,
+    limitMiddleware,
+    MessageController.getByQuery
+);
 router.put('/check/:id', authMiddleware, MessageController.checkMessage);
 router.post('/create', authMiddleware, MessageController.createMessage);
 router.delete('/delete/:id', authMiddleware, MessageController.deleteMessage);

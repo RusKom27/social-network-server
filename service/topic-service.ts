@@ -1,7 +1,6 @@
 import {Topic} from "../models";
 import {deletePunctuationMarks} from "../helpers/misc";
 import {IPost} from "../interfaces";
-import {TopicFilter} from "../types";
 import ApiError from "../exeptions/api-error";
 
 class TopicService {
@@ -12,7 +11,7 @@ class TopicService {
         return topic;
     }
 
-    async getTopicsByFilter(filter: TopicFilter, sort?: any[], limit = 10) {
+    async getTopicsByFilter(filter: any, sort?: any[], limit = 10) {
         return await Topic.find(filter).sort(sort).limit(limit).lean().exec();
     }
 

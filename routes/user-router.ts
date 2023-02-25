@@ -5,8 +5,7 @@ import {authMiddleware, filterMiddleware, limitMiddleware, sortMiddleware} from 
 const router = express.Router();
 
 router.get('/', filterMiddleware, sortMiddleware, limitMiddleware, UserController.getByQuery);
-router.get('/id/:id', UserController.getById);
-router.get('/id_array', UserController.getByIdArray);
+router.get('/:id', UserController.getById);
 router.post('/create', UserController.createUser);
 router.post('/update', authMiddleware, UserController.updateUser);
 router.put('/subscribe/:user_id', authMiddleware, UserController.subscribeUser);

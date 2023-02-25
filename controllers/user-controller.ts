@@ -3,6 +3,7 @@ import {getToken, getUserId} from "../helpers/validation";
 import {UserService} from "../service";
 import {CustomRequest} from "../types/express/CustomRequest";
 import {Types} from "mongoose";
+import bcrypt from "bcrypt";
 
 
 class UserController {
@@ -25,16 +26,6 @@ class UserController {
         }
     }
 
-    async getByIdArray (req: Request, res: Response, next: NextFunction) {
-        try {
-            if (!req.query.users_id) return res.status(404).send({message: "Users query is empty"});
-            const users = await UserService.getUsersById(req.query.users_id as string[]);
-            return res.status(200).send(users);
-        } catch (err: any) {
-            next(err);
-        }
-    }
-
     async createUser (req: Request, res: Response, next: NextFunction) {
         try {
             const user = await UserService.createUser(
@@ -49,10 +40,15 @@ class UserController {
         }
     }
 
-    async updateUser (req: Request, res: Response, next: NextFunction) {
+    async updateUser (req: CustomRequest, res: Response, next: NextFunction) {
         try {
-            const token = getToken(req.headers.authorization);
-            const user = await UserService.getUserByIdAndUpdate(token, req.body);
+            const user_id = getUserId(req.user_id);
+            const hashed_password = req.body.password ? await bcrypt.hash(req.body.password, 3) : undefined;
+
+            const user = await UserService.getUserByIdAndUpdate(user_id, {
+                ...req.body,
+                password: hashed_password,
+            });
             return res.status(200).json(user);
         } catch (err: any) {
             next(err);

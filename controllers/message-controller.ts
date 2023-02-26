@@ -34,7 +34,7 @@ class MessageController {
                 req.sort?.message,
                 req.limit
             );
-            return res.status(200).json(messages.map(message => message._id));
+            return res.status(200).json(messages);
         } catch (err: any) {
             next(err);
         }

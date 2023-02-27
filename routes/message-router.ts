@@ -15,6 +15,7 @@ router.get(
     MessageController.getByQuery
 );
 router.put('/check/:id', authMiddleware, MessageController.checkMessage);
+router.put('/update/:id', authMiddleware, MessageController.updateMessage);
 router.post('/create', authMiddleware, MessageController.createMessage);
 router.delete('/delete/:id', authMiddleware, MessageController.deleteMessage);
 

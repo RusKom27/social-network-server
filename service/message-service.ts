@@ -1,6 +1,7 @@
 import {Types} from "mongoose";
 import {Message} from "../models";
 import ApiError from "../exeptions/api-error";
+import {IMessage} from "../interfaces";
 
 class MessageService {
     async getMessageById(id: Types.ObjectId | string) {

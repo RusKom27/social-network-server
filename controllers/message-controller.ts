@@ -61,6 +61,18 @@ class MessageController {
         }
     }
 
+    async updateMessage (req: CustomRequest, res: Response, next: NextFunction) {
+        try {
+            const message = await MessageService.getMessageByIdAndUpdate(
+                req.params.id,
+                req.body,
+            );
+            return res.status(201).json(message);
+        } catch (err: any) {
+            next(err);
+        }
+    }
+
     async deleteMessage (req: CustomRequest, res: Response, next: NextFunction) {
         try {
             const user_id = getUserId(req.user_id);

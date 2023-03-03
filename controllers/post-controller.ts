@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {PostService, TopicService, UserService} from "../service";
+import {MessageService, PostService, TopicService, UserService} from "../service";
 import {getTagsFromText} from "../helpers/misc";
 import {getUserId} from "../helpers/validation";
 import ApiError from "../exeptions/api-error";
@@ -33,6 +33,17 @@ class PostController {
                 getTagsFromText(req.body.text)
             );
             await TopicService.addTopicsFromPost(post);
+            return res.status(201).json(post);
+        } catch (err: any) {
+            next(err);
+        }
+    }
+    async updatePost (req: CustomRequest, res: Response, next: NextFunction) {
+        try {
+            const post = await PostService.getPostByIdAndUpdate(
+                req.params.id,
+                req.body,
+            );
             return res.status(201).json(post);
         } catch (err: any) {
             next(err);
